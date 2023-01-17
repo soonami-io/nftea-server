@@ -27,15 +27,18 @@ fn handle_connection(mut stream: TcpStream) {
         );
     }
 
-    // SAMPLE RESPONSE:
-    // HTTP-Version Status-Code Reason-Phrase CRLF
-    // headers CRLF
-    // message-body
-    // e.g. HTTP/1.1 200 OK\r\n\r\n
+    let get =  b"GET / HTTP/1.1\r\n";
+    let (status_line, filename_path) = 
+        if buffer.starts_with(get) {
+            ("HTTP/1.1 200 OK", "html/index.html")
+        } else {
+            ("HTTP/1.1 404 NOT FOUND", "html/404.html")
+        };
 
-    let contents = fs::read_to_string("index.html").unwrap();
+    let contents = fs::read_to_string(filename_path).unwrap();
     let response = format!(
-        "HTTP/1.1 200 OK\r\nContent-Length: {}\r\n\r\n{}",
+        "{}\r\nContent-Length: {}\r\n\r\n{}",
+        status_line,
         contents.len(),
         contents
     );

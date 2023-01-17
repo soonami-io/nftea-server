@@ -2,7 +2,7 @@ use std::net::TcpListener;
 use std::net::TcpStream;
 use std::io::prelude::*;
 use std::fs;
-use std::thread;
+// use std::thread;
 // use std::time::Duration;
 use server::ThreadPool;
 
@@ -12,14 +12,15 @@ fn main() {
     let listener = 
         TcpListener::bind("127.0.0.1:7878")
         .unwrap(); // error throw a panic for developement, requires error handling in production
+
     let pool = ThreadPool::new(4); // SPECIFY THE SERVER MAX THREADS TO PROCESS REQUESTS
+
     for stream in listener.incoming() {
         let stream = stream.unwrap();
 
         pool.execute( || {
             handle_connection(stream);
-        });
-        
+        });   
     }
 }
 

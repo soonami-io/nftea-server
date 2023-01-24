@@ -36,7 +36,7 @@ const primary_ingredients = [
         image: "",
         weight: 2,
     }
-]
+];
 
 const secondary_ingredients = [
     {
@@ -123,25 +123,55 @@ const secondary_ingredients = [
         image: "",
         weight: 1,
     }
-]
+];
 
 const app_component = {
     data() {
         return {
             primary_set: primary_ingredients,
             secondary_set: secondary_ingredients,
-            random_primary_index: 0
+            random_primary_index: 0,
+            wallet_address: null,
+            web3_connected: false,
+            contract_address: "0x0",
+            abi: [],
         }
     },
     methods: {
-        randomize_primary() {
+        randomize_primary: function() {
             this.random_primary_index = Math.floor(Math.random() * this.primary_set.length);
+        },
+        connect_wallet: async function() {
+            if (typeof window.ethereum !== "undefined") {
+               const ok = await ethereum.request({method: "eth_requestAccounts"})
+                .catch(err => {   
+                    console.log("Err Code: ", err.code, "\nErr Message: ", err.message)
+                    return false
+                });
+               if (ok) {
+                    this.wallet_address = ok[0];
+                    this.web3_connected = true;
+                    localStorage.setItem(userWallet, this.wallet_address);
+               }
+            }
+        },
+        execute_web3: async function() {
+            console.log("some thing executed.")
+            const provider = new ethers.providers.Web3Provider(window.ehtereum);
+            const signer = provider.getSigner();
+            const contract = new ethers.Contract(
+                this.contract_address,
+                this.abi,
+                signer,
+            );
+            // await contract.[function](params) calling the mint function on the contract
         }
     },
     template: `
         <div id="app-header">
-            <p> {{ primary_set[random_primary_index].name }} </p>
+            <p>{{ primary_set[random_primary_index].name }}</p>
             <button @click="randomize_primary" class="button"> Get Primary </button>
+            <button @click="connect_wallet" class="button"> Connect Wallet </button>
         </div>
     `
 }

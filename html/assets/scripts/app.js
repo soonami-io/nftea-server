@@ -143,20 +143,23 @@ const app_component = {
         },
         connect_wallet: async function() {
             if (typeof window.ethereum !== "undefined") {
-               const ok = await ethereum.request({method: "eth_requestAccounts"})
-                .catch(err => {   
-                    console.log("Err Code: ", err.code, "\nErr Message: ", err.message)
-                    return false
-                });
-               if (ok) {
+                try {
+                    const ok = await ethereum.request({method: "eth_requestAccounts"})
                     this.wallet_address = ok[0];
                     this.web3_connected = true;
-                    localStorage.setItem(userWallet, this.wallet_address);
-               }
+                    localStorage.setItem("wallet_address", this.wallet_address);
+                } catch {
+                    console.log("Err Code: ", err.code, "\nErr Message: ", err.message)
+                }               
+            } else {
+                alert("Please install MetaMast");
+                this.web3_connected = false;
+                this.wallet_address = null;
+                localStorage.removeItem("wallet_address");
             }
         },
         execute_web3: async function() {
-            console.log("some thing executed.")
+            console.log("some web3 getting executed!")
             const provider = new ethers.providers.Web3Provider(window.ehtereum);
             const signer = provider.getSigner();
             const contract = new ethers.Contract(
@@ -164,7 +167,11 @@ const app_component = {
                 this.abi,
                 signer,
             );
-            // await contract.[function](params) calling the mint function on the contract
+            try {
+                // await contract.[function](params); calling the mint function on the contract
+            } catch(error) {
+                console.log(error);
+            }
         }
     },
     template: `

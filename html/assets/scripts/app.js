@@ -1,4 +1,4 @@
-const { createApp } = Vue;
+const { createApp, ref } = Vue;
 const primary_ingredients = [
     {
         id: 0,
@@ -130,6 +130,8 @@ const app_component = {
         return {
             primary_set: primary_ingredients,
             secondary_set: secondary_ingredients,
+            nft_primary_combination: [],
+            nft_secondary_combination: [],
             random_primary_index: 0,
             wallet_address: null,
             web3_connected: false,
@@ -174,14 +176,55 @@ const app_component = {
             }
         }
     },
-    template: `
-        <div id="app-header">
-            <p>{{ primary_set[random_primary_index].name }}</p>
-            <button @click="randomize_primary" class="button"> Get Primary </button>
-            <button @click="connect_wallet" class="button"> Connect Wallet </button>
-        </div>
-    `
+    // mounted() {
+    //     console.log("ingridients primary: ", this.primary_set);
+    // },
+    computed: {
+        nft_primary_combination_count() {
+           return this.nft_primary_combination.length;
+        },
+        nft_secondary_combination_count() {
+            return this.nft_secondary_combination.length;
+        },
+        nft_combination() {
+            return [...this.nft_primary_combination, ...this.nft_secondary_combination];
+        }
+    },
+    watch: {
+        nft_primary_combination_count(value) {
+            if (value > 2) {
+                this.nft_primary_combination.pop();
+                alert("Select only two (2) primary ingridents.");
+            }
+        },
+        nft_secondary_combination_count(value) {
+            if (value > 5) {
+                this.nft_secondary_combination.pop();
+                alert("Select only five (5) primary ingridents.");
+            }
+        },
+    }
+    
 }
 
 createApp(app_component).mount('#app');
 
+const template = `
+        <div id="app-header">
+            <p>{{ primary_set[random_primary_index].name }}</p>
+            <button @click="randomize_primary" class="button"> Get Primary </button>
+            <button @click="connect_wallet" class="button"> Connect Wallet </button>
+            <form>      
+                <fieldset>      
+                    <legend>Pick 2 of your primary ingredients</legend>
+                    <div class="primary form_item">
+                        <label class="checkbox_item" v-for="ingridient in primary_set" :key="ingridient.id">
+                            <input type="checkbox" name="primary_ingrident" :value="ingridient.id" v-model="ingrident.selected">
+                            {{ ingridient.name }}
+                        </label>
+                        <br>
+                    </div>    
+                </fieldset>
+            </form>
+        </div>
+    `

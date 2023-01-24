@@ -24,11 +24,51 @@
         <div class="container">
             <h1>Savor the Unique Flavors of NFT Tea with NFTea</h1>
             <h2>Mint your NFTea's One-of-a-Kind Tea Items</h2>
-            <div id="app"></div>
+            <div id="app">
+                <div id="app-header">
+                    <p>{{ primary_set[random_primary_index].name }}</p>
+                    <button @click="randomize_primary" class="button"> Get Primary </button>
+                    <button @click="connect_wallet" class="button"> Connect Wallet </button> 
+                    <form>      
+                        <fieldset>      
+                            <legend>Pick 2 of your primary ingredients</legend>
+                            <template v-for="ingridient in primary_set">
+                                <label :for="ingridient.id" class="checkbox_item">
+                                    <input type="checkbox" name="primary_ingridient" :value="ingridient" :id="ingridient.id" v-model="nft_primary_combination">
+                                    {{ ingridient.name }}
+                                </label>
+                                <br>
+                            </template>    
+                        </fieldset>
+
+                        <fieldset>      
+                            <legend>Pick 5 of your primary ingredients</legend>
+                            <template v-for="ingridient in secondary_set">
+                                <label :for="ingridient.id" class="checkbox_item">
+                                    <input type="checkbox" name="primary_ingridient" :value="ingridient" :id="ingridient.id" v-model="nft_secondary_combination">
+                                    {{ ingridient.name }}
+                                </label>
+                                <br>
+                            </template>    
+                        </fieldset>
+                    </form>
+                </div>
+                <hr>
+                <div>
+                    <h3>Selected Primaries: </h3>
+                    <p>{{ nft_primary_combination }}</p>
+                    <h3>Selected Secondaries: </h3>
+                    <p>{{ nft_secondary_combination }}</p>
+
+                    <hr />
+                    <h3>The Combination: </h3>
+                    <p>{{ nft_combination }}</p>
+                </div>
+            </div>
         </div>
         <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
         <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
         <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
-        <script src="./assets/scripts/app.js"></script>
+        <script src="./assets/scripts/app.js" type="text/javascript"></script>
     </body>
 </html>

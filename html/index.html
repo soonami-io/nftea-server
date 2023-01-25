@@ -26,30 +26,36 @@
             <h2>Mint your NFTea's One-of-a-Kind Tea Items</h2>
             <div id="app">
                 <div id="app-header">
-                    <p>{{ primary_set[random_primary_index].name }}</p>
-                    <button @click="randomize_primary" class="button"> Get Primary </button>
                     <button @click="connect_wallet" class="button"> Connect Wallet </button> 
                     <form>      
-                        <fieldset>      
+                        <fieldset class="primary_ingridient">      
                             <legend>Pick 2 of your primary ingredients</legend>
-                            <template v-for="ingridient in primary_set">
+                            <div v-for="ingridient in primary_set">
+                                <input type="checkbox" name="primary_ingridient" :value="ingridient" :id="ingridient.id" v-model="nft_primary_combination">
                                 <label :for="ingridient.id" class="checkbox_item">
-                                    <input type="checkbox" name="primary_ingridient" :value="ingridient" :id="ingridient.id" v-model="nft_primary_combination">
-                                    {{ ingridient.name }}
+                                    <div class="image">
+                                        <img src="https://loremflickr.com/320/240" :alt="ingridient.name" />
+                                    </div>
+                                    <div class="title">
+                                        {{ ingridient.name }}
+                                    </div>
                                 </label>
-                                <br>
-                            </template>    
+                            </div>    
                         </fieldset>
 
-                        <fieldset>      
-                            <legend>Pick 5 of your primary ingredients</legend>
-                            <template v-for="ingridient in secondary_set">
+                        <fieldset class="secondary_ingridient">      
+                            <legend>Pick 5 of your secondary ingredients</legend>
+                            <div v-for="ingridient in secondary_set">
+                                <input type="checkbox" name="secondary_ingridient" :value="ingridient" :id="ingridient.id" v-model="nft_secondary_combination">
                                 <label :for="ingridient.id" class="checkbox_item">
-                                    <input type="checkbox" name="primary_ingridient" :value="ingridient" :id="ingridient.id" v-model="nft_secondary_combination">
-                                    {{ ingridient.name }}
+                                    <div class="icon">
+                                        <img :src="ingridient.image" :alt="ingridient.name" />
+                                    </div>
+                                    <div class="title">
+                                        {{ ingridient.name }}
+                                    </div>
                                 </label>
-                                <br>
-                            </template>    
+                            </div>    
                         </fieldset>
                     </form>
                 </div>

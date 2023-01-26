@@ -17,6 +17,11 @@
         <link rel="icon" href="./assets/image/favicon.ico">
         <link rel="icon" href="./assets/image/favicon.svg" type="image/svg+xml">
         <link rel="apple-touch-icon" href="./assets/image/apple-touch-icon.png">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Cabin&family=Roboto+Flex:opsz@8..144&display=swap" rel="stylesheet">
 
         <link rel="stylesheet" href="./assets/styles/styles.css?v=1.0">
     </head>
@@ -25,8 +30,7 @@
             <h1>Savor the Unique Flavors of NFT Tea with NFTea</h1>
             <h2>Mint your NFTea's One-of-a-Kind Tea Items</h2>
             <div id="app">
-                <div id="app-header">
-                    <button @click="connect_wallet" class="button"> Connect Wallet </button> 
+                <div id="options">
                     <form>      
                         <fieldset class="primary_ingridient">      
                             <legend>Pick 2 of your primary ingredients</legend>
@@ -48,7 +52,7 @@
                             <div v-for="ingridient in secondary_set">
                                 <input type="checkbox" name="secondary_ingridient" :value="ingridient" :id="ingridient.id" v-model="nft_secondary_combination">
                                 <label :for="ingridient.id" class="checkbox_item">
-                                    <div class="icon">
+                                    <div class="image">
                                         <img :src="ingridient.image" :alt="ingridient.name" />
                                     </div>
                                     <div class="title">
@@ -59,7 +63,19 @@
                         </fieldset>
                     </form>
                 </div>
-                <hr>
+                <div id="operation">
+                    <div id="preview">
+                        <div id="image-box">
+                            <!-- add the cup image box -->
+                        </div>
+                        <div id="buttons">
+                            <button v-if="!web3_connected" @click="connect_wallet" class="button"> Connect Wallet </button>
+                            <button v-else-if="!art_generated" @click="connect_wallet" class="button"> Brew Tea </button> 
+                            <button v-else @click="connect_wallet" class="button"> Mint My NFTea </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- <hr>
                 <div>
                     <h3>Selected Primaries: </h3>
                     <p>{{ nft_primary_combination }}</p>
@@ -69,7 +85,7 @@
                     <hr />
                     <h3>The Combination: </h3>
                     <p>{{ nft_combination }}</p>
-                </div>
+                </div> -->
             </div>
         </div>
         <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>

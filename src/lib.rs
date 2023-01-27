@@ -1,15 +1,17 @@
 use std::{thread, sync::{mpsc, Arc, Mutex}};
+use std::hash::{Hash, Hasher};
 
-pub struct ThreadPool {
-    workers: Vec<Worker>,
-    sender:mpsc::Sender<Message>,
-}
 
 type Job = Box<dyn FnOnce() + Send + 'static>;
 
 enum Message {
     NewJob(Job),
     Terminate,
+}
+
+pub struct ThreadPool {
+    workers: Vec<Worker>,
+    sender:mpsc::Sender<Message>,
 }
 
 impl ThreadPool {
@@ -90,5 +92,68 @@ impl Worker {
         });
 
         Worker {id, thread: Some(thread)}
+    }
+}
+
+#[derive(Debug)]
+pub struct HashTable<T> {
+    data: Vec<Option<T>>,
+    capacity: usize,
+}
+
+
+impl<T: Hash + std::clone::Clone + std::cmp::PartialEq> HashTable<T> {
+    pub fn new(capacity: usize) -> Self {
+        Self {
+            data: vec![None; capacity],
+            capacity,
+        }
+    }
+
+    pub fn insert(&mut self, item: T) {
+        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+        item.hash(&mut hasher);
+        let mut pos = hasher.finish() as usize % self.capacity;
+
+        while let Some(ref existing) = self.data[pos] {
+            if *existing == item {
+                return;
+            }
+
+            pos = (pos + 1) % self.capacity;
+        }
+
+        self.data[pos] = Some(item);
+    }
+
+    pub fn search(&self, item: &T) -> bool {
+        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+        item.hash(&mut hasher);
+        let mut pos = hasher.finish() as usize % self.capacity;
+
+        while let Some(ref existing) = self.data[pos] {
+            if *existing == *item {
+                return true;
+            }
+
+            pos = (pos + 1) % self.capacity;
+        }
+
+        false
+    }
+
+    pub fn delete(&mut self, item: &T) {
+        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+        item.hash(&mut hasher);
+        let mut pos = hasher.finish() as usize % self.capacity;
+
+        while let Some(ref existing) = self.data[pos] {
+            if *existing == *item {
+                self.data[pos] = None;
+                return;
+            }
+
+            pos = (pos + 1) % self.capacity;
+        }
     }
 }

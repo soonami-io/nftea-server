@@ -11,7 +11,7 @@ const DEBUGGER: bool = true;
 fn main() {
 
     if DEBUGGER {
-        let hashtable: HashTable<String> = HashTable::new(10);
+        let hashtable: HashTable<String> = HashTable::new(10, "hashtable.bin");
         println!("The Hashtable is: \n{:#?}", hashtable);
     }
      

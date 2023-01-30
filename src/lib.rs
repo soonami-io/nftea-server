@@ -1,7 +1,11 @@
 use std::{thread, sync::{mpsc, Arc, Mutex}};
 use std::hash::{Hash, Hasher};
+use serde::{Serialize, Deserialize};
+use std::fs::File;
+use std::io::{BufReader, BufWriter, Write, Read};
+use bincode::{serialize, deserialize};
 
-
+// ThreadPool Lib
 type Job = Box<dyn FnOnce() + Send + 'static>;
 
 enum Message {
@@ -95,48 +99,58 @@ impl Worker {
     }
 }
 
-#[derive(Debug)]
+
+// HashTable Lib
+#[derive(Debug, Serialize, Deserialize)]
 pub struct HashTable<T> {
     data: Vec<Option<T>>,
     capacity: usize,
+    file_name: String,
 }
 
-
-impl<T: Hash + std::clone::Clone + std::cmp::PartialEq> HashTable<T> {
-    pub fn new(capacity: usize) -> Self {
+impl<T: Hash + std::clone::Clone + std::cmp::PartialEq + Serialize + for<'a> Deserialize<'a>> HashTable<T> {
+    pub fn new(capacity: usize, file_name: &str) -> Self {
+        let mut data = vec![None; capacity];
+        if let Ok(file) = File::open(file_name) {
+            let mut reader = BufReader::new(file);
+            let mut buffer = Vec::new();
+            reader.read_to_end(&mut buffer).unwrap();
+            data = deserialize(&buffer).unwrap();
+        }
         Self {
-            data: vec![None; capacity],
+            data,
             capacity,
+            file_name: file_name.to_string(),
         }
     }
 
     pub fn insert(&mut self, item: T) {
         let mut hasher = std::collections::hash_map::DefaultHasher::new();
         item.hash(&mut hasher);
-        let mut pos = hasher.finish() as usize % self.capacity;
+        let mut position = hasher.finish() as usize % self.capacity;
 
-        while let Some(ref existing) = self.data[pos] {
+        while let Some(ref existing) = self.data[position] {
             if *existing == item {
                 return;
             }
 
-            pos = (pos + 1) % self.capacity;
+            position = (position + 1) % self.capacity;
         }
 
-        self.data[pos] = Some(item);
+        self.data[position] = Some(item);
     }
 
     pub fn search(&self, item: &T) -> bool {
         let mut hasher = std::collections::hash_map::DefaultHasher::new();
         item.hash(&mut hasher);
-        let mut pos = hasher.finish() as usize % self.capacity;
+        let mut position = hasher.finish() as usize % self.capacity;
 
-        while let Some(ref existing) = self.data[pos] {
+        while let Some(ref existing) = self.data[position] {
             if *existing == *item {
                 return true;
             }
 
-            pos = (pos + 1) % self.capacity;
+            position = (position + 1) % self.capacity;
         }
 
         false
@@ -145,15 +159,39 @@ impl<T: Hash + std::clone::Clone + std::cmp::PartialEq> HashTable<T> {
     pub fn delete(&mut self, item: &T) {
         let mut hasher = std::collections::hash_map::DefaultHasher::new();
         item.hash(&mut hasher);
-        let mut pos = hasher.finish() as usize % self.capacity;
+        let mut position = hasher.finish() as usize % self.capacity;
 
-        while let Some(ref existing) = self.data[pos] {
+        while let Some(ref existing) = self.data[position] {
             if *existing == *item {
-                self.data[pos] = None;
+                self.data[position] = None;
+                self.rehash_delete(position);
+                self.save();
                 return;
             }
 
-            pos = (pos + 1) % self.capacity;
+            position = (position + 1) % self.capacity;
         }
     }
+
+    fn save(&self) {
+        let serialized = serialize(&self.data).unwrap();
+        let file = File::create(&self.file_name).unwrap();
+        let mut writer = BufWriter::new(file);
+        writer.write(&serialized).unwrap();
+    }
+
+    fn rehash_delete(&mut self, mut position: usize) {
+        position = (position + 1) % self.capacity;
+        while let Some(item) = self.data[position].take() {
+            let mut hasher = std::collections::hash_map::DefaultHasher::new();
+            item.hash(&mut hasher);
+            let mut new_position = hasher.finish() as usize % self.capacity;
+            while self.data[new_position].is_some() {
+                new_position = (new_position + 1) % self.capacity;
+            }
+            self.data[new_position] = Some(item);
+            position = (position + 1) % self.capacity;
+        }
+    }
+
 }

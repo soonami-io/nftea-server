@@ -1,96 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-        <title>NFTea - The Digital Tea Experience: Unique NFT Tea Items for Collectors and Enthusiasts</title>
-        <meta name="description" content="Join the tea-riffic world of NFTs with NFTea! Our project is brewing up a storm with unique and delicious NFT tea items that will make your taste buds and your wallet happy. Sip, collect and brag about your one-of-a-kind digital tea finds with NFTea - the perfect blend of tradition and innovation.">
-        <meta name="author" content="NFTea">
+    <title>
+      NFTea - The Digital Tea Experience: Unique NFT Tea Items for Collectors
+      and Enthusiasts
+    </title>
+    <meta
+      name="description"
+      content="Join the tea-riffic world of NFTs with NFTea! Our project is brewing up a storm with unique and delicious NFT tea items that will make your taste buds and your wallet happy. Sip, collect and brag about your one-of-a-kind digital tea finds with NFTea - the perfect blend of tradition and innovation."
+    />
+    <meta name="author" content="NFTea" />
 
-        <meta property="og:title" content="NFTea - The Digital Tea Experience: Unique NFT Tea Items for Collectors and Enthusiasts">
-        <meta property="og:type" content="website">
-        <meta property="og:url" content="https://www.nftea-example.com/">
-        <meta property="og:description" content="NFTea - the ultimate blend of tradition and innovation. Discover our unique NFT tea items and elevate your tea collection to a whole new level with our one-of-a-kind, digitally-signed tea finds.">
-        <meta property="og:image" content="./assets/image/og-image.png">
+    <meta
+      property="og:title"
+      content="NFTea - The Digital Tea Experience: Unique NFT Tea Items for Collectors and Enthusiasts"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.nftea-example.com/" />
+    <meta
+      property="og:description"
+      content="NFTea - the ultimate blend of tradition and innovation. Discover our unique NFT tea items and elevate your tea collection to a whole new level with our one-of-a-kind, digitally-signed tea finds."
+    />
+    <meta property="og:image" content="./assets/image/og-image.png" />
 
-        <link rel="icon" href="./assets/image/favicon.ico">
-        <link rel="icon" href="./assets/image/favicon.svg" type="image/svg+xml">
-        <link rel="apple-touch-icon" href="./assets/image/apple-touch-icon.png">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Cabin&family=Roboto+Flex:opsz@8..144&display=swap" rel="stylesheet">
+    <link rel="icon" href="./assets/image/favicon.ico" />
+    <link rel="icon" href="./assets/image/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./assets/image/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cabin&family=Roboto+Flex:opsz@8..144&display=swap"
+      rel="stylesheet"
+    />
 
-        <link rel="stylesheet" href="./assets/styles/styles.css">
-    </head>
-    <body>
-        <div class="container">
-            <h1>Savor the Unique Flavors of NFT Tea with NFTea</h1>
-            <h2>Mint your NFTea's One-of-a-Kind Tea Items</h2>
-            <div id="app">
-                <div id="options">
-                    <form>      
-                        <fieldset class="primary_ingridient">      
-                            <legend>Pick 2 of your primary ingredients</legend>
-                            <div v-for="ingridient in primary_set">
-                                <input type="checkbox" name="primary_ingridient" :value="ingridient" :id="ingridient.id" v-model="nft_primary_combination">
-                                <label :for="ingridient.id" class="checkbox_item">
-                                    <div class="image">
-                                        <img src="https://loremflickr.com/320/240" :alt="ingridient.name" />
-                                    </div>
-                                    <div class="title">
-                                        {{ ingridient.name }}
-                                    </div>
-                                </label>
-                            </div>    
-                        </fieldset>
-
-                        <fieldset class="secondary_ingridient">      
-                            <legend>Pick 5 of your secondary ingredients</legend>
-                            <div v-for="ingridient in secondary_set">
-                                <input type="checkbox" name="secondary_ingridient" :value="ingridient" :id="ingridient.id" v-model="nft_secondary_combination">
-                                <label :for="ingridient.id" class="checkbox_item">
-                                    <div class="image">
-                                        <img :src="ingridient.image" :alt="ingridient.name" />
-                                    </div>
-                                    <div class="title">
-                                        {{ ingridient.name }}
-                                    </div>
-                                </label>
-                            </div>    
-                        </fieldset>
-                    </form>
-                </div>
-                <div id="operation">
-                    <div id="preview">
-                        <div id="image-box">
-                            <!-- add the cup image box -->
-                        </div>
-                        <div id="buttons">
-                            <button v-if="!web3_connected" @click="connect_wallet" class="button"> Connect Wallet </button>
-                            <button v-else-if="!art_generated" @click="connect_wallet" class="button"> Brew Tea </button> 
-                            <button v-else @click="connect_wallet" class="button"> Mint My NFTea </button>
-                        </div>
-                    </div>
-                </div>
-                <!-- <hr>
-                <div>
-                    <h3>Selected Primaries: </h3>
-                    <p>{{ nft_primary_combination }}</p>
-                    <h3>Selected Secondaries: </h3>
-                    <p>{{ nft_secondary_combination }}</p>
-
-                    <hr />
-                    <h3>The Combination: </h3>
-                    <p>{{ nft_combination }}</p>
-                </div> -->
+    <link rel="stylesheet" href="./assets/styles/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <nav>
+          <div class="logo">
+            <!-- LOGO here -->
+            <img src="./assets/image/logo.png" alt="Logo" />
+          </div>
+          <div class="titles">
+            <!-- Titles here -->
+            <div class="titles desktop-only">
+              <h1>savor the unique flavors of tea with nft<span>ea</span></h1>
+              <h2>mint your one-of-a-kind tea nft item</h2>
             </div>
+          </div>
+          <div class="actions">
+            <!-- wallet connect -->
+            <button>connect wallet </button>
+          </div>
+        </nav>
+      </header>
+      <main class="container">
+        <div class="titles mobile-only">
+          <h1>
+            savor the unique flavors of tea with nft<span>ea</span
+            >
+          </h1>
+          <h2>mint your one-of-a-kind tea nft item</h2>
         </div>
-        <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
-        <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-        <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
-        <script src="./assets/scripts/app.js" type="text/javascript"></script>
-    </body>
+        <div id="vue-app">
+          <div id="options">
+            <form>
+              <fieldset class="primary_ingridient">
+                <legend>Pick 2 of your primary ingredients</legend>
+                <div v-for="ingridient in primary_set">
+                  <input
+                    type="checkbox"
+                    name="primary_ingridient"
+                    :value="ingridient"
+                    :id="ingridient.id"
+                    v-model="nft_primary_combination"
+                  />
+                  <label :for="ingridient.id" class="checkbox_item">
+                    <div class="image">
+                      <img
+                        src="https://loremflickr.com/320/240"
+                        :alt="ingridient.name"
+                      />
+                    </div>
+                    <div class="title">{{ ingridient.name }}</div>
+                  </label>
+                </div>
+              </fieldset>
+
+              <fieldset class="secondary_ingridient">
+                <legend>Pick 5 of your secondary ingredients</legend>
+                <div v-for="ingridient in secondary_set">
+                  <input
+                    type="checkbox"
+                    name="secondary_ingridient"
+                    :value="ingridient"
+                    :id="ingridient.id"
+                    v-model="nft_secondary_combination"
+                  />
+                  <label :for="ingridient.id" class="checkbox_item">
+                    <div class="image">
+                      <img :src="ingridient.image" :alt="ingridient.name" />
+                    </div>
+                    <div class="title">{{ ingridient.name }}</div>
+                  </label>
+                </div>
+              </fieldset>
+            </form>
+          </div>
+          <div id="operation">
+            <div id="preview">
+              <div id="image-box">
+                <!-- add the cup image box -->
+              </div>
+              <div id="buttons">
+                <button
+                  v-if="!web3_connected"
+                  @click="connect_wallet"
+                  class="full-width"
+                >
+                  Connect Wallet
+                </button>
+                <button
+                  v-else-if="!art_generated"
+                  @click="connect_wallet"
+                  class="full-width"
+                >
+                  Brew Tea
+                </button>
+                <button v-else @click="connect_wallet" class="full-width">
+                  Mint My NFTea
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <footer>
+        <!-- the footer data -->
+        <ul>
+          <li>Copyright by FlyingFishTea</li>
+          <li>
+            Powered by
+            <a href="https://unbounded.vision/#mquark" target="_blank">
+              mQuark schema protocol
+            </a>
+          </li>
+          <li>
+            Partnerd with
+            <a href="https://soonami.io" target="_blank"> Soonami </a>
+          </li>
+        </ul>
+      </footer>
+    </div>
+    <script
+      src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"
+      type="application/javascript"
+    ></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
+    <script src="./assets/scripts/app.js" type="text/javascript"></script>
+  </body>
 </html>

@@ -139,6 +139,17 @@ const app_component = {
             abi: [],
         }
     },
+    computed: {
+        nft_primary_combination_count() {
+           return this.nft_primary_combination.length;
+        },
+        nft_secondary_combination_count() {
+            return this.nft_secondary_combination.length;
+        },
+        nft_combination() {
+            return [...this.nft_primary_combination, ...this.nft_secondary_combination];
+        }
+    },   
     methods: {
         randomize_primary: function() {
             this.random_primary_index = Math.floor(Math.random() * this.primary_set.length);
@@ -175,21 +186,7 @@ const app_component = {
                 console.log(error);
             }
         }
-    },
-    // mounted() {
-    //     console.log("ingridients primary: ", this.primary_set);
-    // },
-    computed: {
-        nft_primary_combination_count() {
-           return this.nft_primary_combination.length;
-        },
-        nft_secondary_combination_count() {
-            return this.nft_secondary_combination.length;
-        },
-        nft_combination() {
-            return [...this.nft_primary_combination, ...this.nft_secondary_combination];
-        }
-    },
+    },    
     watch: {
         nft_primary_combination_count(value) {
             if (value > 2) {
@@ -203,11 +200,14 @@ const app_component = {
                 alert("Select only five (5) primary ingridents.");
             }
         },
+    },
+    mounted() {
+        console.log("heelo from mounted lifecycle!");
+        // add eventlistenr here
     }
-    
 }
 
-createApp(app_component).mount('#app');
+createApp(app_component).mount('#vue-app');
 
 const template = `
         <div id="app-header">

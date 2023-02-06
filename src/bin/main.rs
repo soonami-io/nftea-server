@@ -6,15 +6,13 @@ use std::fs;
 // use std::time::Duration;
 use server::{ThreadPool, HashTable};
 
-const DEBUGGER: bool = true;
+const DEBUGGER: bool = false;
 
 fn main() {
-
     if DEBUGGER {
         let hashtable: HashTable<String> = HashTable::new(10, "hashtable.bin");
         println!("The Hashtable is: \n{:#?}", hashtable);
     }
-     
 
     let listener = 
         TcpListener::bind("127.0.0.1:7878")

@@ -41,7 +41,7 @@
     <link rel="stylesheet" href="./assets/styles/styles.css" />
   </head>
   <body>
-    <div class="container">
+    <div id="vue-app" class="container">
       <header>
         <nav>
           <div class="logo">
@@ -57,11 +57,12 @@
           </div>
           <div class="actions">
             <!-- wallet connect -->
-            <button>connect wallet </button>
+            <button v-if="!web3_connected" @click="connect_wallet">connect wallet</button>
+            <button class="disabled" v-else>connected</button>
           </div>
         </nav>
       </header>
-      <main class="container">
+      <main class="wrapper">
         <div class="titles mobile-only">
           <h1>
             savor the unique flavors of tea with nft<span>ea</span
@@ -69,47 +70,57 @@
           </h1>
           <h2>mint your one-of-a-kind tea nft item</h2>
         </div>
-        <div id="vue-app">
+        <div class="minter">
           <div id="options">
             <form>
-              <fieldset class="primary_ingridient">
-                <legend>Pick 2 of your primary ingredients</legend>
-                <div v-for="ingridient in primary_set">
-                  <input
-                    type="checkbox"
-                    name="primary_ingridient"
-                    :value="ingridient"
-                    :id="ingridient.id"
-                    v-model="nft_primary_combination"
-                  />
-                  <label :for="ingridient.id" class="checkbox_item">
-                    <div class="image">
-                      <img
-                        src="https://loremflickr.com/320/240"
-                        :alt="ingridient.name"
-                      />
-                    </div>
-                    <div class="title">{{ ingridient.name }}</div>
-                  </label>
+              <fieldset class="ingridient grid">
+                <legend><h3>Pick 2 of your primary ingredients</h3></legend>
+                <div class="grid__wrapper">
+                    <div class="card" v-for="ingridient in primary_set">
+                        <input
+                          type="checkbox"
+                          name="primary_ingridient"
+                          :value="ingridient"
+                          :id="ingridient.id"
+                          v-model="nft_primary_combination"
+                        />
+                        <label :for="ingridient.id" class="checkbox_item stacked">
+                            <img
+                              class="card__img"
+                              :src="ingridient.image"
+                              :alt="ingridient.name"
+                            />
+                          <div class="card__content">
+                              <h3 class="card__title">{{ ingridient.name }}</h3>
+                          </div>
+                        </label>
+                      </div>
                 </div>
               </fieldset>
 
               <fieldset class="secondary_ingridient">
-                <legend>Pick 5 of your secondary ingredients</legend>
-                <div v-for="ingridient in secondary_set">
-                  <input
-                    type="checkbox"
-                    name="secondary_ingridient"
-                    :value="ingridient"
-                    :id="ingridient.id"
-                    v-model="nft_secondary_combination"
-                  />
-                  <label :for="ingridient.id" class="checkbox_item">
-                    <div class="image">
-                      <img :src="ingridient.image" :alt="ingridient.name" />
-                    </div>
-                    <div class="title">{{ ingridient.name }}</div>
-                  </label>
+                <legend><h3>Pick 5 of your secondary ingredients</h3></legend>
+                <div class="grid__wrapper">
+                    <div class="card" v-for="ingridient in secondary_set">
+                        <input
+                          type="checkbox"
+                          name="secondary_ingridient"
+                          :value="ingridient"
+                          :id="ingridient.id"
+                          v-model="nft_secondary_combination"
+                        />
+                        <label :for="ingridient.id" class="checkbox_item stacked">
+                            <img
+                              class="card__img"
+                              :src="ingridient.image"
+                              :alt="ingridient.name"
+                            />
+                            <!-- <div class="image card__img" :style="`background-image: url(${ingridient.image});`"></div> -->
+                          <div class="card__content">
+                              <h3 class="card__title">{{ ingridient.name }}</h3>
+                          </div>
+                        </label>
+                      </div>
                 </div>
               </fieldset>
             </form>

@@ -1,90 +1,90 @@
-   html {
-    color: #222;
-    font-size: 1em;
-    line-height: 1.4;
-  }
-  
-  /*
+html {
+  color: #222;
+  font-size: 1em;
+  line-height: 1.4;
+}
+
+/*
    * Remove text-shadow in selection highlight:
    * https://twitter.com/miketaylr/status/12228805301
    *
    * Customize the background color to match your design.
    */
-  
-  ::-moz-selection {
-    background: #b3d4fc;
-    text-shadow: none;
-  }
-  
-  ::selection {
-    background: #b3d4fc;
-    text-shadow: none;
-  }
-  
-  /*
+
+::-moz-selection {
+  background: #b3d4fc;
+  text-shadow: none;
+}
+
+::selection {
+  background: #b3d4fc;
+  text-shadow: none;
+}
+
+/*
    * A better looking default horizontal rule
    */
-  
-  hr {
-    display: block;
-    height: 1px;
-    border: 0;
-    border-top: 1px solid #ccc;
-    margin: 1em 0;
-    padding: 0;
-  }
-  
-  /*
+
+hr {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #ccc;
+  margin: 1em 0;
+  padding: 0;
+}
+
+/*
    * Remove the gap between audio, canvas, iframes,
    * images, videos and the bottom of their containers:
    * https://github.com/h5bp/html5-boilerplate/issues/440
    */
-  
-  audio,
-  canvas,
-  iframe,
-  img,
-  svg,
-  video {
-    vertical-align: middle;
-  }
-  
-  /*
+
+audio,
+canvas,
+iframe,
+img,
+svg,
+video {
+  vertical-align: middle;
+}
+
+/*
    * Remove default fieldset styles.
    */
-  
-  fieldset {
-    border: 0;
-    margin: 0;
-    padding: 0;
-  }
-  
-  /*
+
+fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+/*
    * Allow only vertical resizing of textareas.
    */
-  
-  textarea {
-    resize: vertical;
-  }
-  
-  /* ==========================================================================
+
+textarea {
+  resize: vertical;
+}
+
+/* ==========================================================================
      Author's custom styles
      ========================================================================== */
-  
-  /* ==========================================================================
+
+/* ==========================================================================
      Helper classes
      ========================================================================== */
-  
-  /*
+
+/*
    * Hide visually and from screen readers
    */
-  
-  .hidden,
-  [hidden] {
-    display: none !important;
-  }
-  
-  /*
+
+.hidden,
+[hidden] {
+  display: none !important;
+}
+
+/*
    * Hide only visually, but have it available for screen readers:
    * https://snook.ca/archives/html_and_css/hiding-content-for-accessibility
    *
@@ -92,445 +92,487 @@
    *    causes content to wrap 1 word per line:
    *    https://medium.com/@jessebeach/beware-smushed-off-screen-accessible-text-5952a4c2cbfe
    */
-  
-  .visually-hidden {
-    border: 0;
-    clip: rect(0, 0, 0, 0);
-    height: 1px;
-    margin: -1px;
-    overflow: hidden;
-    padding: 0;
-    position: absolute;
-    white-space: nowrap;
-    width: 1px;
-    /* 1 */
-  }
-  
-  /*
+
+.visually-hidden {
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+  /* 1 */
+}
+
+/*
    * Extends the .visually-hidden class to allow the element
    * to be focusable when navigated to via the keyboard:
    * https://www.drupal.org/node/897638
    */
-  
-  .visually-hidden.focusable:active,
-  .visually-hidden.focusable:focus {
-    clip: auto;
-    height: auto;
-    margin: 0;
-    overflow: visible;
-    position: static;
-    white-space: inherit;
-    width: auto;
-  }
-  
-  /*
+
+.visually-hidden.focusable:active,
+.visually-hidden.focusable:focus {
+  clip: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  position: static;
+  white-space: inherit;
+  width: auto;
+}
+
+/*
    * Hide visually and from screen readers, but maintain layout
    */
-  
-  .invisible {
-    visibility: hidden;
-  }
-  
-  /*
+
+.invisible {
+  visibility: hidden;
+}
+
+/*
    * Clearfix: contain floats
    *
    * The use of `table` rather than `block` is only necessary if using
    * `::before` to contain the top-margins of child elements.
    */
-  
-  .clearfix::before,
-  .clearfix::after {
-    content: "";
-    display: table;
-  }
-  
-  .clearfix::after {
-    clear: both;
-  }
 
-  .full-width {
-    width: 100%;
-  }
-  
-  /* ==========================================================================
+.clearfix::before,
+.clearfix::after {
+  content: "";
+  display: table;
+}
+
+.clearfix::after {
+  clear: both;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.stacked {
+  display: grid;
+}
+
+.stacked > * {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+}
+
+/* ==========================================================================
      Fonts
      ========================================================================== */
 
-  @font-face {
-    font-family: "RoyalSignage";
-    src: url(../fonts/RoyalSignage-Regular.ttf);
-  }
+@font-face {
+  font-family: "RoyalSignage";
+  src: url(../fonts/RoyalSignage-Regular.ttf);
+}
 
-  /* ==========================================================================
+/* ==========================================================================
      Main Styles
      ========================================================================== */
 
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  html:focus-within {
-    scroll-behavior: smooth;
-  }
+html:focus-within {
+  scroll-behavior: smooth;
+}
 
-  body {
-    font-family: "Roboto Flex", sans-serif;
-    background: #f5f5f5;
-    min-height: 100vh;
-    text-rendering: optimizeSpeed;
-    line-height: 1.2;
-  }
+body {
+  font-family: "Roboto Flex", sans-serif;
+  background: #f5f5f5;
+  min-height: 100vh;
+  text-rendering: optimizeSpeed;
+  line-height: 1.2;
+}
 
-  h1, h2, h3, h4, h5 {
-    font-family: "RoyalSignage", "Cabin", cursive;
-  }
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: "RoyalSignage", "Cabin", cursive;
+}
 
-  a:not([class]) {
-    text-decoration-skip-ink: auto;
-  }
+a:not([class]) {
+  text-decoration-skip-ink: auto;
+}
 
-  ul[role="list"],
-  ol[role="list"] {
-    list-style: none;
-  }
+ul[role="list"],
+ol[role="list"] {
+  list-style: none;
+}
 
-  /* img,
-  picture {
-    max-width: 100%;
-    display: block;
-  } */
+img, picture {
+  max-width: 100%;
+  display: block;
+}
 
-  div.container {
-    display: grid;
-    /* margin: 0 auto; */
-    align-items: center;
-    justify-content: center;
-    grid-template-rows: auto;
-    padding: 1rem;
-    max-width: 100rem;
-    margin-inline: auto;
-    padding-inline: 2rem;
-  }
+div.container {
+  display: grid;
+  /* margin: 0 auto; */
+  align-items: center;
+  justify-content: center;
+  grid-template-rows: auto;
+  padding: 1rem;
+  max-width: 100rem;
+  margin-inline: auto;
+  padding-inline: 2rem;
+}
 
-  .titles.mobile-only {
-    display: none;
-  }
+.titles.mobile-only {
+  display: none;
+}
 
-  h1 {
-    font-size: 1.25rem;
-  }
+h1 {
+  font-size: 1.25rem;
+}
 
-  h1 span  {
-    font-size: 0.75rem;
-  }
+h1 span {
+  font-size: 0.75rem;
+}
 
-  h2 {
-    font-size: 1rem;
-  }
-  
-  /* Header */
-  header {
-    display: grid;
-    align-items: center;
-  }
-  
-  header nav {
-    display: grid;
-    grid-template-columns: 1fr 4fr 1fr;
-    align-items: center;
-    justify-content: space-between;
-  }
+h2 {
+  font-size: 1rem;
+}
 
-  header img {
-    max-width: 4rem;
-    max-height: 4rem;
-  }
+/* ==========================================================================
+     Header
+     ========================================================================== */
+header {
+  display: grid;
+  align-items: center;
+}
 
-  header .actions {
-    display: flex;
-    justify-content: flex-end;
-  }
+header nav {
+  display: grid;
+  grid-template-columns: 1fr 4fr 1fr;
+  align-items: center;
+  justify-content: space-between;
+}
 
-  /* Buttons */
-  a.button {
-    background-color: hsl(165, 30%, 65%);
-    padding: 0.5rem 0.75rem;
-    border-radius: 50vmin;
-    font-size: small;
-    cursor: pointer;
-  }
+header img {
+  max-width: 4rem;
+  max-height: 4rem;
+}
 
-  a.button:hover {
-    background-color: hsl(165, 40%, 65%);
-    transform: scale(1.1);
-    transition: all 0.2s ease-in-out;
-  }
+header .actions {
+  display: flex;
+  justify-content: flex-end;
+}
 
-  a.button:active {
-    background-color: hsl(165, 20%, 65%);
-    transform: scale(0.5);
-    transition: all 0.1s ease-in-out;
-  }
-  
-  
+/* ==========================================================================
+     Minting Wrapper
+========================================================================== */
 
-  .container h1, .container h2 {
-    color: #888;
-    text-align: center;
-  }
+main.wrapper {
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  grid-template-rows: auto;
 
-  div#app {
-    display: grid;
-    align-items: center;
-    justify-content: center;
-    grid-template-columns: 8fr 2fr;
-    /* grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); */
-  }
+  /* background-color: #e6e6e6; */
+}
 
-  div#options {
-    padding: 0.5rem;
-  }
+main div.minter {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: 8fr 2fr;
+}
 
-  div#operation {
-    /* display: flex;
+/* ==========================================================================
+  Minter Options
+========================================================================== */
+
+main div#options {
+  /* padding: 0.5rem; */
+}
+
+form h3 {
+  font-size: medium;
+  color: hsl(0, 0%, 40%);
+}
+
+div#options form fieldset {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-rows: auto;
+}
+
+form > fieldset > div.grid__wrapper {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 1rem;
+}
+
+form .card label {
+  position: relative;
+  border: 3px solid transparent;
+  aspect-ratio: 1 / 1.25;
+  padding: .25rem;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  text-align: center;
+  transition: all 0.2s ease-in-out;
+}
+
+form .card label .card__img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+form .card label .card__content {
+  z-index: 99;
+  /* background-color: hsl(169, 27%, 60%); */
+  background-color:white;
+  box-shadow: 0 .25rem 1rem rgb(0 0 0 / .1);
+  align-self: end;
+  margin: 0.2rem;
+  padding: 0.2rem;
+  border-radius: 4px;
+}
+
+form .card label .card__content h3 {
+  font-size: 0.7rem;
+  color: #333;
+}
+
+form fieldset > div input {
+  display: none;
+}
+
+form fieldset > div img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center center;
+  border-radius: 5px;
+  transition: all 200ms ease-in-out;
+}
+
+form fieldset > div title {
+  font-size: 0.9rem;
+  color: #555;
+  padding: 0.3rem 0;
+  transition: all 200ms ease-in-out;
+}
+
+form fieldset > div.grid__wrapper div label:before {
+  content: "✓";
+  position: absolute;
+  width: 1rem;
+  height: 1rem;
+  inset: 0.5rem 0 0 0.5rem;
+  background: hsl(140, 100%, 27%);
+  color: #fff;
+  text-align: center;
+  line-height: 1.1rem;
+  font-size: 0.5rem;
+  font-weight: 600;
+  border-radius: 50%;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 200ms ease-in-out;
+  z-index: 99999;
+}
+
+form fieldset > div input:checked + label:before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* form fieldset > div input:checked + label .image {
+      border: 3px dashed gray;
+    } */
+
+form fieldset > div input:checked + label .title {
+  color: hsl(140, 100%, 27%);
+}
+
+form fieldset > div input:checked + label {
+  border: 1px solid hsl(140, 100%, 27%);
+}
+
+div#operation {
+  /* display: flex;
     flex-direction: row;
     align-items: flex-start;
     justify-content: center;
     gap: 0.25rem; */
-  }
+}
 
-  div#preview {
-    display: grid;
-    align-items: flex-start;
-    justify-content: flex-start;
-    gap: 0.25rem;
-  }
+div#preview {
+  display: grid;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0.25rem;
+}
 
-  div#preview > #image-box {
-    align-self: flex-start;
-    width: calc(25vw - 1.5rem);
-    height: calc(25vw - 1.5rem);
-    background-color: #c0c0c0;
-    border-radius: 0.5rem;
-    border: 0.1rem solid gray;
-  }
+div#preview > #image-box {
+  align-self: flex-start;
+  width: calc(25vw - 1.5rem);
+  height: calc(25vw - 1.5rem);
+  background-color: #c0c0c0;
+  border-radius: 0.5rem;
+  border: 0.1rem solid gray;
+}
 
-  button {
-    background-color: hsl(165, 30%, 65%);
-    padding: 0.5rem 0.75rem;
-    border-radius: 50vmin;
-    font-size: small;
-    font-weight: 500;
-    color: #333;
-    border: none;
-    cursor: pointer;
-  }
+/* ==========================================================================
+     Buttons
+     ========================================================================== */
 
-  button:hover {
-    background-color: hsl(165, 40%, 65%);
-  }
+a.button {
+  background-color: hsl(165, 30%, 65%);
+  padding: 0.5rem 0.75rem;
+  border-radius: 50vmin;
+  font-size: small;
+  cursor: pointer;
+}
 
-  button:active {
-    transition: all 0.1s ease-in-out;
-    transform: scale(0.98);
-  }
+a.button:hover {
+  background-color: hsl(165, 40%, 65%);
+  transform: scale(1.1);
+  transition: all 0.2s ease-in-out;
+}
 
-  form fieldset {
-    margin-top: 2rem;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    max-width: 100vw;
-  }
-  
-  form fieldset > div {
-    position: relative;
-    width: 7rem;
-    height: 7rem;
-    padding: 0.2rem;
-  }
+a.button:active {
+  background-color: hsl(165, 20%, 65%);
+  transform: scale(0.5);
+  transition: all 0.1s ease-in-out;
+}
 
-  form fieldset > div input {
-    display: none;
-  }
+button {
+  background-color: hsl(165, 30%, 65%);
+  padding: 0.5rem 0.75rem;
+  border-radius: 50vmin;
+  font-size: small;
+  font-weight: 500;
+  color: #333;
+  border: none;
+  cursor: pointer;
+}
 
-  form fieldset > div label {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    cursor: pointer;
-    border: 0.1rem solid #ddd;
-    border-radius: 0.5rem;
-    box-shadow: 0 5px 20px 2px hsla(0, 0%, 0%, 0.1);
-    text-align: center;
-    transition: all 200ms ease-in-out;
-  }
+button:hover {
+  background-color: hsl(165, 40%, 65%);
+}
 
-  form fieldset > div img {
-    margin-top: 0.2rem;
-    width: 90%;
-    height: 90%;
-    object-fit: contain; 
-    object-position: center center;
-    transition: all 200ms ease-in-out;
-  }
+button:active {
+  transition: all 0.1s ease-in-out;
+  transform: scale(0.98);
+}
 
-  form fieldset > div title {
-    font-size: 0.9rem;
-    color: #555;
-    padding: 0.3rem 0;
-    transition: all 200ms ease-in-out;
-  }
-
-  form fieldset > div label:before {
-    content: "✓";
-    position: absolute;
-    width: 1rem;
-    height: 1rem;
-    inset: 0.5rem 0 0 0.5rem;
-    background: hsl(140, 100%, 27%);;
-    color: #fff;
-    text-align: center;
-    line-height: 1.1rem;
-    font-size: 0.5rem;
-    font-weight: 600;
-    border-radius: 50%;
-    opacity: 0;
-    transform: scale(0.5);
-    transition: all 200ms ease-in-out;
-    z-index: 99999;
-  }
-
-  form fieldset > div input:checked + label:before {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  /* form fieldset > div input:checked + label .image {
-    border: 3px dashed gray;
-  } */
-
-  form fieldset > div input:checked + label .title {
-    color: hsl(140, 100%, 27%);
-  }
-
-  form fieldset > div input:checked + label {
-    border: 1px solid hsl(140, 100%, 27%);
-  }
-
-
-  /* ==========================================================================
+/* ==========================================================================
      Media Queries for Responsive Design.
      overrides the primary ('mobile first') styles.
      ========================================================================== */
-  
-     @media only screen and (max-width: 38rem) {
-      header nav {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        justify-content: space-between;
-      }
 
-      header nav .titles {
-        display: none;
-      }
-      .titles.mobile-only {
-        display: block;
-      }
-    }
+@media only screen and (max-width: 38rem) {
+  header nav {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    justify-content: space-between;
+  }
 
-    @media (prefers-reduced-motion: reduce) {
-      html:focus-within {
-        scroll-behavior: auto;
-      }
+  header nav .titles {
+    display: none;
+  }
+  .titles.mobile-only {
+    display: block;
+  }
+}
 
-      *,
-      *::before,
-      *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
-      }
-    }
-    
-    @media print,
-      (-webkit-min-device-pixel-ratio: 1.25),
-      (min-resolution: 1.25dppx),
-      (min-resolution: 120dpi) {
-      /* Style adjustments for high resolution devices */
-    }
-    
-    /* ==========================================================================
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media print,
+  (-webkit-min-device-pixel-ratio: 1.25),
+  (min-resolution: 1.25dppx),
+  (min-resolution: 120dpi) {
+  /* Style adjustments for high resolution devices */
+}
+
+/* ==========================================================================
        Print styles.
        Inlined to avoid the additional HTTP request:
        https://www.phpied.com/delay-loading-your-print-css/
        ========================================================================== */
-    
-    @media print {
-      *,
-      *::before,
-      *::after {
-        background: #fff !important;
-        color: #000 !important;
-        /* Black prints faster */
-        box-shadow: none !important;
-        text-shadow: none !important;
-      }
-    
-      a,
-      a:visited {
-        text-decoration: underline;
-      }
-    
-      a[href]::after {
-        content: " (" attr(href) ")";
-      }
-    
-      abbr[title]::after {
-        content: " (" attr(title) ")";
-      }
-    
-      /*
+
+@media print {
+  *,
+  *::before,
+  *::after {
+    background: #fff !important;
+    color: #000 !important;
+    /* Black prints faster */
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  a,
+  a:visited {
+    text-decoration: underline;
+  }
+
+  a[href]::after {
+    content: " (" attr(href) ")";
+  }
+
+  abbr[title]::after {
+    content: " (" attr(title) ")";
+  }
+
+  /*
        * Don't show links that are fragment identifiers,
        * or use the `javascript:` pseudo protocol
        */
-      a[href^="#"]::after,
-      a[href^="javascript:"]::after {
-        content: "";
-      }
-    
-      pre {
-        white-space: pre-wrap !important;
-      }
-    
-      pre,
-      blockquote {
-        border: 1px solid #999;
-        page-break-inside: avoid;
-      }
-    
-      tr,
-      img {
-        page-break-inside: avoid;
-      }
-    
-      p,
-      h2,
-      h3 {
-        orphans: 3;
-        widows: 3;
-      }
-    
-      h2,
-      h3 {
-        page-break-after: avoid;
-      }
-    }
-  
+  a[href^="#"]::after,
+  a[href^="javascript:"]::after {
+    content: "";
+  }
 
+  pre {
+    white-space: pre-wrap !important;
+  }
+
+  pre,
+  blockquote {
+    border: 1px solid #999;
+    page-break-inside: avoid;
+  }
+
+  tr,
+  img {
+    page-break-inside: avoid;
+  }
+
+  p,
+  h2,
+  h3 {
+    orphans: 3;
+    widows: 3;
+  }
+
+  h2,
+  h3 {
+    page-break-after: avoid;
+  }
+}

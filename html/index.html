@@ -139,7 +139,7 @@
                 </button>
                 <button
                   v-else-if="!art_generated"
-                  @click="connect_wallet"
+                  @click="execute_web3"
                   class="full-width"
                 >
                   Brew Tea
@@ -155,7 +155,7 @@
     </div>
     <footer>
       <ul>
-        <li>© Copyright 2023 Flying Fish Tea / Soonami </li>
+        <li>© Copyright 2023 Flying Fish Tea / Soonami</li>
         <li>
           <p>
             Made with love in Berlin, by
@@ -178,6 +178,11 @@
     ></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
+    <script
+      src="./assets/abi/PaymentWrapper.json"
+      type="text/json"
+      id="contractAbi"
+    ></script>
     <script src="./assets/scripts/app.js" type="text/javascript"></script>
   </body>
 </html>

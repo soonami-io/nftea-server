@@ -39,145 +39,217 @@
     />
 
     <link rel="stylesheet" href="./assets/styles/styles.css" />
+    <link rel="stylesheet" href="./assets/styles/frontpage.css" />
+    <script
+      src="https://kit.fontawesome.com/301f6acdfd.js"
+      crossorigin="anonymous"
+    ></script>
   </head>
   <body>
-    <div id="vue-app" class="container">
+    <div class="container">
       <header>
-        <nav>
-          <div class="logo">
-            <!-- LOGO here -->
-            <img class="nftea" src="./assets/image/logo.png" alt="Logo" />
+        <nav class="navbar">
+          <div class="socials">
+            <ul>
+              <li class="icon">
+                <a href="https://twitter.com/NFTeaProject" target="_blank">
+                  <i class="fa-brands fa-twitter"></i>
+                </a>
+              </li>
+              <li class="icon">
+                <a href="https://discord.gg/5YqWu8QDeZ" target="_blank">
+                  <i class="fa-brands fa-discord"></i>
+                </a>
+              </li>
+              <li class="icon">
+                <a href="https://www.instagram.com/flyingfishteaco/" target="_blank">
+                  <i class="fa-brands fa-instagram"></i>
+                </a>
+              </li>
+            </ul>
           </div>
-          <div class="titles">
-            <!-- Titles here -->
-            <div class="titles desktop-only">
-              <h1>savor the unique flavors of tea with nft<span>ea</span></h1>
-              <h2>mint your one-of-a-kind tea nft item</h2>
-            </div>
+          <div class="logo">
+            <img src="./assets/image/logo.png" alt="Logo" />
           </div>
           <div class="actions">
-            <!-- wallet connect -->
-            <button v-if="!web3_connected" @click="connect_wallet">
-              connect wallet
-            </button>
-            <button class="disabled" v-else>connected</button>
+            <button><a href="/mint.html">Brew & Mint</a></button>
           </div>
         </nav>
       </header>
-      <main class="wrapper">
-        <div class="titles mobile-only">
-          <h1>savor the unique flavors of tea with nft<span>ea</span></h1>
-          <h2>mint your one-of-a-kind tea nft item</h2>
-        </div>
-        <div class="minter">
-          <div id="options">
-            <form>
-              <fieldset class="ingridient grid">
-                <legend><h3>Pick up to 2 primary ingredients</h3></legend>
-                <div class="grid__wrapper">
-                  <div class="card" v-for="ingridient in primary_set">
-                    <input
-                      type="checkbox"
-                      name="primary_ingridient"
-                      :value="ingridient"
-                      :id="ingridient.id"
-                      v-model="nft_primary_combination"
-                    />
-                    <label :for="ingridient.id" class="checkbox_item stacked">
-                      <img
-                        class="card__img"
-                        :src="ingridient.image"
-                        :alt="ingridient.name"
-                      />
-                      <div class="card__content">
-                        <h3 class="card__title">{{ ingridient.name }}</h3>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-              </fieldset>
-
-              <fieldset class="secondary_ingridient">
-                <legend><h3>Pick upto 5 secondary ingredients</h3></legend>
-                <div class="grid__wrapper">
-                  <div class="card" v-for="ingridient in secondary_set">
-                    <input
-                      type="checkbox"
-                      name="secondary_ingridient"
-                      :value="ingridient"
-                      :id="ingridient.id"
-                      v-model="nft_secondary_combination"
-                    />
-                    <label :for="ingridient.id" class="checkbox_item stacked">
-                      <img
-                        class="card__img"
-                        :src="ingridient.image"
-                        :alt="ingridient.name"
-                      />
-                      <!-- <div class="image card__img" :style="`background-image: url(${ingridient.image});`"></div> -->
-                      <div class="card__content">
-                        <h3 class="card__title">{{ ingridient.name }}</h3>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-              </fieldset>
-            </form>
-          </div>
-          <div id="operation">
-            <div id="preview">
-              <div id="image-box">
-                <!-- add the cup image box -->
-              </div>
-              <div id="buttons">
-                <button
-                  v-if="!web3_connected"
-                  @click="connect_wallet"
-                  class="full-width"
-                >
-                  Connect Wallet
-                </button>
-                <button
-                  v-else-if="!art_generated"
-                  @click="connect_wallet"
-                  class="full-width"
-                >
-                  Brew Tea
-                </button>
-                <button v-else @click="connect_wallet" class="full-width">
-                  Mint My NFTea
-                </button>
-              </div>
+      <main>
+        <section id="story" class="story">
+          <div class="contents">
+            <div class="content">
+              <h1>Story of the nft<span>ea</span></h1>
+              <p>
+                Once upon a time, in a far-off land, there were six different
+                types of tea - Black tea, White tea, Green tea, Rooibos tea,
+                Pu-eah tea and Oolong tea. They lived in their separate tea
+                gardens and were content with their daily routines. But one day,
+                they heard about the wonderful world of web3 and decided to go
+                on a journey together to explore it.
+              </p>
+              <p>
+                Green tea was excited about the trip because he had heard that
+                web3 was a place where everything was transparent and fair.
+                Black tea was curious about the new technology and wanted to
+                learn more about it. Oolong tea was eager to see how it could
+                benefit emerging markets, and Rooibos tea was just happy to be
+                going on an adventure with her friends.
+              </p>
+              <p>
+                The four teas set off on their journey, crossing mountains and
+                valleys, until they finally reached the entrance to the web3
+                world - a soonami.io discord server.
+              </p>
+            </div>
+            <div class="illustration">
+              <img src="./assets/image/story.png" alt="story image" />
             </div>
           </div>
-        </div>
+          <div class="navigator">
+            <a href="#goal" class="linkto"
+              ><i class="fa-solid fa-arrow-down"></i
+            ></a>
+          </div>
+        </section>
+        <hr />
+        <section id="goal" class="goal">
+          <div class="contents">
+            <div class="illustration">
+              <img src="./assets/image/soonami.png" alt="soonami image" />
+            </div>
+            <div class="content">
+              <h1>Get to know your makers</h1>
+              <p>
+                soonami.io is a launchpad for the best projects and teams in
+                web3 with a strong belief in a decentralized future,
+                zero-knowledge, and the power of DAOs, building teams and
+                funding projects working towards a decentralized world, and it
+                is the best place to be, build and grow! Within its discord
+                server, soonami connects with its community to help founders
+                scale their businesses and educate those who are curious about
+                blockchain.
+              </p>
+              <p>
+                One of the ventures accelerated by soonami is Unbounded Dao, a
+                platform providing an agnostic toolchain for the web3 ecosystem.
+                One of its products is mQuark, which offers interoperability and
+                a blueprint-style schema for NFTs. mQuark allows users to mint
+                any object as an NFT, upgrade it, and attach properties to it
+                for use across any web3 or metaverse platform, turning it into a
+                functional asset that can be staked, used as collateral, or
+                involved in DeFi activities.
+              </p>
+              <p>
+                soonami used mQuark as technology to provide you NFTea - an
+                invitation to come and drink a cup of tea together! Mint NFTea
+                and join the web3 revolution at the soonami discord server.
+              </p>
+            </div>
+          </div>
+          <div class="navigator">
+            <a href="#utility" class="linkto"
+              ><i class="fa-solid fa-arrow-down"></i
+            ></a>
+          </div>
+        </section>
+        <hr />
+        <section id="utility" class="utility">
+          <h1>Utilities</h1>
+          <div class="contents">
+            <div class="card">
+              <img src="./assets/image/98.png" alt="Community" />
+              <h2>Community</h2>
+              <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam
+                suscipit exercitationem sed ducimus? Tenetur sapiente ut ullam
+                reprehenderit voluptatibus eos dolorem. Delectus minus, ipsa
+                consectetur ullam fugiat aspernatur laboriosam nulla!
+              </p>
+            </div>
+            <div class="card">
+              <img src="./assets/image/93.png" alt="Voting" />
+              <h2>Voting</h2>
+              <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam
+                suscipit exercitationem sed ducimus? Tenetur sapiente ut ullam
+                reprehenderit voluptatibus eos dolorem. Delectus minus, ipsa
+                consectetur ullam fugiat aspernatur laboriosam nulla!
+              </p>
+            </div>
+            <div class="card">
+              <img src="./assets/image/61.png" alt="Metaverse" />
+              <h2>Metaverse</h2>
+              <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam
+                suscipit exercitationem sed ducimus? Tenetur sapiente ut ullam
+                reprehenderit voluptatibus eos dolorem. Delectus minus, ipsa
+                consectetur ullam fugiat aspernatur laboriosam nulla!
+              </p>
+            </div>
+            <div class="card">
+              <img src="./assets/image/89.png" alt="Events" />
+              <h2>Events</h2>
+              <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam
+                suscipit exercitationem sed ducimus? Tenetur sapiente ut ullam
+                reprehenderit voluptatibus eos dolorem. Delectus minus, ipsa
+                consectetur ullam fugiat aspernatur laboriosam nulla!
+              </p>
+            </div>
+            <div class="card">
+              <img src="./assets/image/97.png" alt="Tea" />
+              <h2>Tea</h2>
+              <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam
+                suscipit exercitationem sed ducimus? Tenetur sapiente ut ullam
+                reprehenderit voluptatibus eos dolorem. Delectus minus, ipsa
+                consectetur ullam fugiat aspernatur laboriosam nulla!
+              </p>
+            </div>
+          </div>
+          <button><a href="/mint.html">Brew & Mint</a></button>
+        </section>
       </main>
+      <footer class="stacked">
+        <div class="wrapper">
+          <div class="logo">
+            <img src="./assets/image/logo.png" alt="Logo" />
+          </div>
+          <div class="socials">
+            <div class="callout">
+              <h2>Connect With Us</h2>
+            </div>
+            <div class="icons">
+              <ul>
+                <li class="icon">
+                  <a href="https://twitter.com/NFTeaProject" target="_blank">
+                    <i class="fa-brands fa-twitter"></i>
+                  </a>
+                </li>
+                <li class="icon">
+                  <a href="https://discord.gg/5YqWu8QDeZ" target="_blank">
+                    <i class="fa-brands fa-discord"></i>
+                  </a>
+                </li>
+                <li class="icon">
+                  <a href="https://www.instagram.com/flyingfishteaco/" target="_blank">
+                    <i class="fa-brands fa-instagram"></i>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="partners">
+            <img src="./assets/image/soonami-logo.png" alt="Logo" />
+            <img src="./assets/image/unbounded-logo.png" alt="Logo" />
+            <img src="./assets/image/foundance-logo.png" alt="Logo" />
+          </div>
+        </div>
+        <img class="hermit stacked" src="./assets/image/80.png" alt="globe" />
+        <img class="globe stacked" src="./assets/image/11.png" alt="hermit" />
+      </footer>
     </div>
-    <footer>
-      <ul>
-        <li>© Copyright 2023 Flying Fish Tea / Soonami </li>
-        <li>
-          <p>
-            Made with love in Berlin, by
-            <a href="https://soonami.io" target="_blank"> Soonami Team</a>
-          </p>
-        </li>
-        <li>
-          <p>
-            Powered by
-            <a href="https://unbounded.vision/#mquark" target="_blank">
-              mQuark schema protocol
-            </a>
-          </p>
-        </li>
-      </ul>
-    </footer>
-    <script
-      src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"
-      type="application/javascript"
-    ></script>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
-    <script src="./assets/scripts/app.js" type="text/javascript"></script>
   </body>
 </html>

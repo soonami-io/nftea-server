@@ -212,7 +212,7 @@ h2,
 h3,
 h4,
 h5 {
-  font-family: "RoyalSignage", "Cabin", cursive;
+  font-family: "RoyalSignage", "Roboto Flex", sans-serif;
 }
 
 a:not([class]) {

@@ -1,5 +1,5 @@
 html {
-  color: #222;
+  /* color: #222; */
   font-size: 1em;
   line-height: 1.4;
 }
@@ -251,15 +251,15 @@ div.container {
 }
 
 h1 {
-  font-size: 1.25rem;
+  font-size: 2.25rem;
 }
 
 h1 span {
-  font-size: 1rem;
+  font-size: 1.7rem;
 }
 
 h2 {
-  font-size: 1rem;
+  font-size: 1.5rem;
 }
 
 /* ==========================================================================
@@ -277,9 +277,9 @@ header nav {
   justify-content: space-between;
 }
 
-header img {
-  max-width: 4rem;
-  max-height: 4rem;
+header img.nftea {
+  max-width: 10rem;
+  max-height: 10rem;
 }
 
 header .actions {
@@ -435,7 +435,7 @@ div#preview > #image-box {
   width: calc(25vw - 1.5rem);
   height: calc(25vw - 1.5rem);
   background-color: #c0c0c0;
-  border-radius: 0.5rem;
+  /* border-radius: 0.5rem; */
   border: 0.1rem solid gray;
 }
 
@@ -466,8 +466,8 @@ button {
   background-color: hsl(0, 0%, 30%);
   color: white;
   font-family: "RoyalSignage";
-  padding: 0.5rem 0.75rem;
-  font-size: small;
+  padding: 1rem 1.5rem;
+  font-size: larger;
   font-weight: 500;
   border: none;
   cursor: pointer;
@@ -508,7 +508,7 @@ a {
   color: #333;
 }
 
-a::before {
+footer a::before {
   content: "🔗";
   filter: grayscale(1);
   font-size: xx-small;

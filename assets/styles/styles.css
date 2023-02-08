@@ -212,7 +212,7 @@ h2,
 h3,
 h4,
 h5 {
-  font-family: "RoyalSignage", "Roboto Flex", sans-serif;
+  font-family: "RoyalSignage", "Cabin", cursive;
 }
 
 a:not([class]) {
@@ -303,7 +303,7 @@ main.wrapper {
 main div.minter {
   display: grid;
   gap: 2rem;
-  grid-template-columns: 8fr 2fr;
+  grid-template-columns: 2fr 10fr ;
 }
 
 /* ==========================================================================
@@ -338,7 +338,7 @@ form > fieldset > div.grid__wrapper {
 form .card label {
   position: relative;
   border: 3px solid transparent;
-  aspect-ratio: 1 / 1.25;
+  aspect-ratio: 1 / 1;
   padding: .25rem;
   cursor: pointer;
   border-radius: 0.5rem;
@@ -435,6 +435,8 @@ div#preview > #image-box {
   width: calc(25vw - 1.5rem);
   height: calc(25vw - 1.5rem);
   background-color: #c0c0c0;
+  background-image: url(../image/empty_tea_cup.png);
+  background-size: contain;
   /* border-radius: 0.5rem; */
   border: 0.1rem solid gray;
 }
@@ -466,7 +468,7 @@ button {
   background-color: hsl(0, 0%, 30%);
   color: white;
   font-family: "RoyalSignage";
-  padding: 1rem 1.5rem;
+  padding: 0.4rem 1.5rem;
   font-size: larger;
   font-weight: 500;
   border: none;

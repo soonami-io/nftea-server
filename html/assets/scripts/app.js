@@ -158,15 +158,51 @@ const app_component = {
             this.random_primary_index = Math.floor(Math.random() * this.primary_set.length);
         },
         connect_wallet: async function () {
+
             if (typeof window.ethereum !== "undefined") {
-                try {
-                    const ok = await ethereum.request({ method: "eth_requestAccounts" })
-                    this.wallet_address = ok[0];
-                    this.web3_connected = true;
-                    localStorage.setItem("wallet_address", this.wallet_address);
-                } catch {
-                    console.log("Err Code: ", err.code, "\nErr Message: ", err.message)
+                const networkId = await window.ethereum.request({
+                    method: "net_version",
+                });
+                if (networkId == 137) { // Polygon mainnet networkid
+                    console.log(networkId)
+                    try {
+                        const ok = await ethereum.request({ method: "eth_requestAccounts" })
+                        this.wallet_address = ok[0];
+                        this.web3_connected = true;
+                        localStorage.setItem("wallet_address", this.wallet_address);
+                    } catch {
+                        console.log("Err Code: ", err.code, "\nErr Message: ", err.message)
+                    }
+                } else {
+                    alert("Please set network to Polygon Mainnet");
+                    try {
+                        // check if the chain to connect to is installed
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: '0x89' }], // chainId must be in hexadecimal numbers
+                        });
+                    } catch (error) {
+                        // This error code indicates that the chain has not been added to MetaMask
+                        // if it is not, then install it into the user MetaMask
+                        if (error.code === 4902) {
+                            try {
+                                await window.ethereum.request({
+                                    method: 'wallet_addEthereumChain',
+                                    params: [
+                                        {
+                                            chainId: '0x89',
+                                            rpcUrl: "https://polygon-rpc.com",
+                                        },
+                                    ],
+                                });
+                            } catch (addError) {
+                                console.error(addError);
+                            }
+                        }
+                        console.error(error);
+                    }
                 }
+
             } else {
                 alert("Please install MetaMast");
                 this.web3_connected = false;
@@ -187,11 +223,11 @@ const app_component = {
             const signer = provider.getSigner();
             this.callBackend(signer);
             //if the user would like to donate call payment function
-            
+
         },
         callBackend: async function (signer) {
-            let initialValue ="";
-            let result = this.nft_combination.reduce((accumulator,currentValue)=>accumulator.concat(currentValue.name),initialValue)
+            let initialValue = "";
+            let result = this.nft_combination.reduce((accumulator, currentValue) => accumulator.concat(currentValue.name), initialValue)
             console.log(result.replace(/\s/g, ""));
         }
     },

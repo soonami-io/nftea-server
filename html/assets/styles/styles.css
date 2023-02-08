@@ -435,6 +435,8 @@ div#preview > #image-box {
   width: calc(25vw - 1.5rem);
   height: calc(25vw - 1.5rem);
   background-color: #c0c0c0;
+  background-image: url(../image/empty_tea_cup.png);
+  background-size: contain;
   /* border-radius: 0.5rem; */
   border: 0.1rem solid gray;
 }

@@ -169,7 +169,10 @@ textarea {
   font-family: "RoyalSignage";
   src: url(../fonts/RoyalSignage-Regular.ttf);
 }
-
+@font-face {
+  font-family: "constantia";
+  src: url(../fonts/constan.ttf);
+}
 /* ==========================================================================
      Main Styles
      ========================================================================== */
@@ -190,7 +193,8 @@ html:focus-within {
 body {
   position: relative;
   display: grid;
-  font-family: "Roboto Flex", sans-serif;
+  font-family: "constantia", "Roboto Flex", sans-serif;
+  font-size: medium;
   background-color: hsl(30, 45%, 85%);
   background-image: url(../image/concrete-wall.png);
   /* background-size: contain; */
@@ -212,7 +216,7 @@ h2,
 h3,
 h4,
 h5 {
-  font-family: "RoyalSignage", "Cabin", cursive;
+  font-family: "RoyalSignage", "Cabin", Arial, Helvetica, sans-serif;
 }
 
 a:not([class]) {

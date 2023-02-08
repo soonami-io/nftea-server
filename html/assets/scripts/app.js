@@ -1,4 +1,5 @@
 const { createApp, ref } = Vue;
+// const { contractAbi } = PaymentWrapper.json
 const primary_ingredients = [
     {
         id: 0,
@@ -135,13 +136,15 @@ const app_component = {
             random_primary_index: 0,
             wallet_address: null,
             web3_connected: false,
-            contract_address: "0x0",
-            abi: [],
+            payment_contract_address: "0x12CB33d84E119EE06Ad2BcDea0bb269E04cf373e",
+            mquark_contract_address: "0x50Fbd77919F74777967fEFB45a7Edad0aD5025C1",
+            payment_abi: abi,
+            _mquark_abi: mquark_abi
         }
     },
     computed: {
         nft_primary_combination_count() {
-           return this.nft_primary_combination.length;
+            return this.nft_primary_combination.length;
         },
         nft_secondary_combination_count() {
             return this.nft_secondary_combination.length;
@@ -149,21 +152,21 @@ const app_component = {
         nft_combination() {
             return [...this.nft_primary_combination, ...this.nft_secondary_combination];
         }
-    },   
+    },
     methods: {
-        randomize_primary: function() {
+        randomize_primary: function () {
             this.random_primary_index = Math.floor(Math.random() * this.primary_set.length);
         },
-        connect_wallet: async function() {
+        connect_wallet: async function () {
             if (typeof window.ethereum !== "undefined") {
                 try {
-                    const ok = await ethereum.request({method: "eth_requestAccounts"})
+                    const ok = await ethereum.request({ method: "eth_requestAccounts" })
                     this.wallet_address = ok[0];
                     this.web3_connected = true;
                     localStorage.setItem("wallet_address", this.wallet_address);
                 } catch {
                     console.log("Err Code: ", err.code, "\nErr Message: ", err.message)
-                }               
+                }
             } else {
                 alert("Please install MetaMast");
                 this.web3_connected = false;
@@ -171,22 +174,27 @@ const app_component = {
                 localStorage.removeItem("wallet_address");
             }
         },
-        execute_web3: async function() {
-            console.log("some web3 getting executed!")
-            const provider = new ethers.providers.Web3Provider(window.ehtereum);
+        //most probably;
+        //template ID will be : 1
+        //collection ID will be : 1
+        //and project ID will be : 1
+        //because 99%, NFTea will be the first project's first collection that inherits the first template :)
+        execute_web3: async function () {
+            // console.log("test");
+            // console.log("some web3 getting executed!")
+            // console.log(this.abi)
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
-            const contract = new ethers.Contract(
-                this.contract_address,
-                this.abi,
-                signer,
-            );
-            try {
-                // await contract.[function](params); calling the mint function on the contract
-            } catch(error) {
-                console.log(error);
-            }
+            this.callBackend(signer);
+            //if the user would like to donate call payment function
+            
+        },
+        callBackend: async function (signer) {
+            let initialValue ="";
+            let result = this.nft_combination.reduce((accumulator,currentValue)=>accumulator.concat(currentValue.name),initialValue)
+            console.log(result.replace(/\s/g, ""));
         }
-    },    
+    },
     watch: {
         nft_primary_combination_count(value) {
             if (value > 2) {

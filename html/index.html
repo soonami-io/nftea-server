@@ -70,6 +70,33 @@
           <h2>mint your one-of-a-kind tea nft item</h2>
         </div>
         <div class="minter">
+          <div id="operation">
+            <div id="preview">
+              <div id="image-box">
+                <!-- add the cup image box -->
+              </div>
+              <div id="buttons">
+                <!-- <button
+                  
+                  @click="connect_wallet"
+                  class="full-width"
+                >
+                  Connect Wallet
+                </button> -->
+                <!-- <button
+                  v-if="web3_connected"
+                  @click="execute_web3"
+                  class="full-width"
+                >
+                  Brew Tea
+                </button> -->
+                <h1>Live at Friday 6PM CET</h1>
+                <!-- <button v-else @click="connect_wallet" class="full-width">
+                  Mint My NFTea
+                </button> -->
+              </div>
+            </div>
+          </div>
           <div id="options">
             <form>
               <fieldset class="ingridient grid">
@@ -124,38 +151,13 @@
               </fieldset>
             </form>
           </div>
-          <div id="operation">
-            <div id="preview">
-              <div id="image-box">
-                <!-- add the cup image box -->
-              </div>
-              <div id="buttons">
-                <button
-                  v-if="!web3_connected"
-                  @click="connect_wallet"
-                  class="full-width"
-                >
-                  Connect Wallet
-                </button>
-                <button
-                  v-else-if="!art_generated"
-                  @click="connect_wallet"
-                  class="full-width"
-                >
-                  Brew Tea
-                </button>
-                <button v-else @click="connect_wallet" class="full-width">
-                  Mint My NFTea
-                </button>
-              </div>
-            </div>
-          </div>
+        
         </div>
       </main>
     </div>
     <footer>
       <ul>
-        <li>© Copyright 2023 Flying Fish Tea / Soonami </li>
+        <li>© Copyright 2023 Flying Fish Tea / Soonami</li>
         <li>
           <p>
             Made with love in Berlin, by
@@ -178,6 +180,15 @@
     ></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
+    <script
+      src="./assets/abi/PaymentWrapper.json"
+      type="text/json"
+      id="contractAbi"
+    ></script>
+    <script
+    src="./assets/scripts/constants.js"
+    ></script>
+
     <script src="./assets/scripts/app.js" type="text/javascript"></script>
   </body>
 </html>

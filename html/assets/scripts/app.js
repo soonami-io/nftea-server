@@ -218,10 +218,23 @@ const app_component = {
         execute_web3: async function () {
             // console.log("test");
             // console.log("some web3 getting executed!")
-            // console.log(this.abi)
             const provider = new ethers.providers.Web3Provider(window.ethereum);
+
             const signer = provider.getSigner();
-            this.callBackend(signer);
+
+            //this.callBackend(signer);
+
+            const payment_contract = new ethers.Contract(
+                this.payment_contract_address,
+                this.payment_abi,
+                signer,
+            );
+            const mquark_contract = new ethers.Contract(
+                this.mquark_contract_address,
+                this._mquark_abi,
+                signer,
+            );
+
             //if the user would like to donate call payment function
 
         },

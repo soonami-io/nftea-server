@@ -8,6 +8,8 @@ use server::{ThreadPool, HashTable};
 
 const DEBUGGER: bool = false;
 
+
+
 fn main() {
     if DEBUGGER {
         let hashtable: HashTable<String> = HashTable::new(10, "hashtable.bin");
@@ -53,6 +55,9 @@ fn handle_connection(mut stream: TcpStream) {
     let server_file_path = format!("html{}", path);
     let server_file_path = server_file_path.as_str();
     // let post =  b"POST /brew HTTP/1.1\r\n";
+    // for IPFS
+    // https://docs.rs/pinata-sdk/latest/pinata_sdk/
+    // https://github.com/ferristseng/rust-ipfs-api
 
     let (mut status_line, mut filename_path) = 
         if buffer.starts_with(get_home) {

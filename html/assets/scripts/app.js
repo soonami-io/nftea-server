@@ -1,5 +1,5 @@
 const { createApp, ref } = Vue;
-const { contractAbi } = PaymentWrapper.json
+// const { contractAbi } = PaymentWrapper.json
 const primary_ingredients = [
     {
         id: 0,
@@ -136,8 +136,10 @@ const app_component = {
             random_primary_index: 0,
             wallet_address: null,
             web3_connected: false,
-            contract_address: "0x6df17D9A6043bB29A978867674bF74567843F9FB",
-            abi: contractAbi.abi,
+            payment_contract_address: "0x12CB33d84E119EE06Ad2BcDea0bb269E04cf373e",
+            mquark_contract_address: "0x50Fbd77919F74777967fEFB45a7Edad0aD5025C1",
+            payment_abi: abi,
+            _mquark_abi: mquark_abi
         }
     },
     computed: {
@@ -172,22 +174,25 @@ const app_component = {
                 localStorage.removeItem("wallet_address");
             }
         },
+        //most probably;
+        //template ID will be : 1
+        //collection ID will be : 1
+        //and project ID will be : 1
+        //because 99%, NFTea will be the first project's first collection that inherits the first template :)
         execute_web3: async function () {
-            console.log("some web3 getting executed!")
-            console.log(this.abi)
+            // console.log("test");
+            // console.log("some web3 getting executed!")
+            // console.log(this.abi)
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
-            const contract = new ethers.Contract(
-                this.contract_address,
-                this.abi,
-                signer,
-            );
-
-            try {
-                // await contract.[function](params); calling the mint function on the contract
-            } catch (error) {
-                console.log(error);
-            }
+            this.callBackend(signer);
+            //if the user would like to donate call payment function
+            
+        },
+        callBackend: async function (signer) {
+            let initialValue ="";
+            let result = this.nft_combination.reduce((accumulator,currentValue)=>accumulator.concat(currentValue.name),initialValue)
+            console.log(result.replace(/\s/g, ""));
         }
     },
     watch: {

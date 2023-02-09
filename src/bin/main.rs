@@ -47,6 +47,7 @@ fn handle_connection(mut stream: TcpStream) {
     }
 
     let get_home =  b"GET / HTTP/1.1\r\n";
+    let get_mint =  b"GET /mint HTTP/1.1\r\n";
     let get_request = format!(
         "{} {} HTTP/1.1\r\n",
         crud_type,
@@ -62,6 +63,8 @@ fn handle_connection(mut stream: TcpStream) {
     let (mut status_line, mut filename_path) = 
         if buffer.starts_with(get_home) {
             ("HTTP/1.1 200 OK", "html/index.html")
+        } else if buffer.starts_with(get_mint) {
+            ("HTTP/1.1 200 OK", "html/mint.html")
         } else if buffer.starts_with(get_request.as_bytes()) {
             ("HTTP/1.1 200 OK", server_file_path)
         } else {
@@ -81,17 +84,58 @@ fn handle_connection(mut stream: TcpStream) {
             (status_line, filename_path) = ("HTTP/1.1 404 NOT FOUND", "html/404.html");
         }
     }
-    
-    let contents = fs::read_to_string(filename_path).unwrap();
-    
-    let response = format!(
-        "{}\r\nContent-Length: {}\r\n\r\n{}",
-        status_line,
-        contents.len(),
-        contents
-    );
 
-    stream.write(response.as_bytes()).unwrap();
+    let response = match filename_path.ends_with(".jpeg") 
+                    || filename_path.ends_with(".jpg") 
+                    || filename_path.ends_with(".png") 
+                    || filename_path.ends_with(".mp4") 
+                    || filename_path.ends_with(".ttf") {
+    true => {
+        let mut file = match std::fs::File::open(filename_path) {
+            Ok(file) => file,
+            Err(e) => {
+                eprintln!("Error opening file: {:?}", e);
+                return;
+            }
+        };
+        let mut contents = vec![];
+        match file.read_to_end(&mut contents) {
+            Ok(_) => {
+                let mut response = format!(
+                    "{}\r\nContent-Type: {}\r\nContent-Length: {}\r\n\r\n",
+                    status_line,
+                    get_content_type(filename_path),
+                    contents.len()
+                );
+                let mut response_bytes = response.into_bytes();
+                response_bytes.extend(contents);
+                response_bytes
+            }
+            Err(e) => {
+                eprintln!("Error reading file: {:?}", e);
+                return;
+            }
+        }
+    }
+    false => {
+        let contents = match fs::read_to_string(filename_path) {
+            Ok(contents) => contents,
+            Err(e) => {
+                eprintln!("Error reading file: {:?}", e);
+                return;
+            }
+        };
+        format!(
+            "{}\r\nContent-Length: {}\r\n\r\n{}",
+            status_line,
+            contents.len(),
+            contents
+        )
+        .into_bytes()
+    }
+};
+
+    stream.write(&response).unwrap();
     stream.flush().unwrap();
 }
 
@@ -104,4 +148,18 @@ fn extract_path_and_crud(buffer: &[u8]) -> (String, String) {
     let path = request_line_segments[1].to_string();
 
     (crud_type, path)
+}
+
+fn get_content_type(filename: &str) -> &str {
+    if filename.ends_with(".jpeg") || filename.ends_with(".jpg") {
+        "image/jpeg"
+    } else if filename.ends_with(".png") {
+        "image/png"
+    } else if filename.ends_with(".mp4") {
+        "video/mp4"
+    } else if filename.ends_with(".ttf") {
+        "application/x-font-ttf"
+    } else {
+        "text/html"
+    }
 }

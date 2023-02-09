@@ -45,97 +45,139 @@ fn handle_connection(mut stream: TcpStream) {
         println!("Buffer starts with {}: {}", crud_type, buffer.starts_with(crud_type.as_bytes()));
     }
 
-    let get_home =  b"GET / HTTP/1.1\r\n";
-    let get_mint =  b"GET /mint HTTP/1.1\r\n";
-    let get_request = format!(
-        "{} {} HTTP/1.1\r\n",
-        crud_type,
-        path
-    );
-    let server_file_path = format!("html{}", path);
-    let server_file_path = server_file_path.as_str();
-    // let post =  b"POST /brew HTTP/1.1\r\n";
-    // for IPFS
-    // https://docs.rs/pinata-sdk/latest/pinata_sdk/
-    // https://github.com/ferristseng/rust-ipfs-api
+    if crud_type == "GET" {
+        let get_home =  b"GET / HTTP/1.1\r\n";
+        let get_mint =  b"GET /mint HTTP/1.1\r\n";
+        let get_request = format!(
+            "{} {} HTTP/1.1\r\n",
+            crud_type,
+            path
+        );
+        let server_file_path = format!("html{}", path);
+        let server_file_path = server_file_path.as_str();
+        // let post =  b"POST /brew HTTP/1.1\r\n";
+        // for IPFS
+        // https://docs.rs/pinata-sdk/latest/pinata_sdk/
+        // https://github.com/ferristseng/rust-ipfs-api
 
-    let (mut status_line, mut filename_path) = 
-        if buffer.starts_with(get_home) {
-            ("HTTP/1.1 200 OK", "html/index.html")
-        } else if buffer.starts_with(get_mint) {
-            ("HTTP/1.1 200 OK", "html/mint.html")
-        } else if buffer.starts_with(get_request.as_bytes()) {
-            ("HTTP/1.1 200 OK", server_file_path)
-        } else {
-            ("HTTP/1.1 404 NOT FOUND", "html/404.html")
-        };    
-    
-    match std::fs::metadata(filename_path) {
-        Ok(metadata) => {
-            if metadata.is_file() {
-                // continue
+        let (mut status_line, mut filename_path) = 
+            if buffer.starts_with(get_home) {
+                ("HTTP/1.1 200 OK", "html/index.html")
+            } else if buffer.starts_with(get_mint) {
+                ("HTTP/1.1 200 OK", "html/mint.html")
+            } else if buffer.starts_with(get_request.as_bytes()) {
+                ("HTTP/1.1 200 OK", server_file_path)
             } else {
+                ("HTTP/1.1 404 NOT FOUND", "html/404.html")
+            };    
+        
+        match std::fs::metadata(filename_path) {
+            Ok(metadata) => {
+                if metadata.is_file() {
+                    // continue
+                } else {
+                    (status_line, filename_path) = ("HTTP/1.1 404 NOT FOUND", "html/404.html");
+                }
+            }
+            Err(e) => {
+                eprintln!("Error reading file: {:?}", e);
                 (status_line, filename_path) = ("HTTP/1.1 404 NOT FOUND", "html/404.html");
             }
         }
-        Err(e) => {
-            eprintln!("Error reading file: {:?}", e);
-            (status_line, filename_path) = ("HTTP/1.1 404 NOT FOUND", "html/404.html");
-        }
-    }
 
-    let response = match filename_path.ends_with(".jpeg") 
-                    || filename_path.ends_with(".jpg") 
-                    || filename_path.ends_with(".png") 
-                    || filename_path.ends_with(".mp4") 
-                    || filename_path.ends_with(".ttf") {
-    true => {
-        let mut file = match std::fs::File::open(filename_path) {
-            Ok(file) => file,
-            Err(e) => {
-                eprintln!("Error opening file: {:?}", e);
-                return;
+        let response = match filename_path.ends_with(".jpeg") 
+                        || filename_path.ends_with(".jpg") 
+                        || filename_path.ends_with(".png") 
+                        || filename_path.ends_with(".mp4") 
+                        || filename_path.ends_with(".ttf") {
+            true => {
+                let mut file = match std::fs::File::open(filename_path) {
+                    Ok(file) => file,
+                    Err(e) => {
+                        eprintln!("Error opening file: {:?}", e);
+                        return;
+                    }
+                };
+                let mut contents = vec![];
+                match file.read_to_end(&mut contents) {
+                    Ok(_) => {
+                        let response = format!(
+                            "{}\r\nContent-Type: {}\r\nContent-Length: {}\r\n\r\n",
+                            status_line,
+                            get_content_type(filename_path),
+                            contents.len()
+                        );
+                        let mut response_bytes = response.into_bytes();
+                        response_bytes.extend(contents);
+                        response_bytes
+                    }
+                    Err(e) => {
+                        eprintln!("Error reading file: {:?}", e);
+                        return;
+                    }
+                }
             }
-        };
-        let mut contents = vec![];
-        match file.read_to_end(&mut contents) {
-            Ok(_) => {
-                let response = format!(
-                    "{}\r\nContent-Type: {}\r\nContent-Length: {}\r\n\r\n",
+            false => {
+                let contents = match fs::read_to_string(filename_path) {
+                    Ok(contents) => contents,
+                    Err(e) => {
+                        eprintln!("Error reading file: {:?}", e);
+                        return;
+                    }
+                };
+                format!(
+                    "{}\r\nContent-Length: {}\r\n\r\n{}",
                     status_line,
-                    get_content_type(filename_path),
-                    contents.len()
-                );
-                let mut response_bytes = response.into_bytes();
-                response_bytes.extend(contents);
-                response_bytes
-            }
-            Err(e) => {
-                eprintln!("Error reading file: {:?}", e);
-                return;
-            }
-        }
-    }
-    false => {
-        let contents = match fs::read_to_string(filename_path) {
-            Ok(contents) => contents,
-            Err(e) => {
-                eprintln!("Error reading file: {:?}", e);
-                return;
+                    contents.len(),
+                    contents
+                )
+                .into_bytes()
             }
         };
-        format!(
-            "{}\r\nContent-Length: {}\r\n\r\n{}",
-            status_line,
-            contents.len(),
-            contents
-        )
-        .into_bytes()
-    }
-};
 
-    stream.write(&response).unwrap();
-    stream.flush().unwrap();
+        stream.write(&response).unwrap();
+        stream.flush().unwrap();
+    } else if crud_type == "POST" {
+        let post_request = b"POST /api/uri HTTP/1.1\r\n";
+
+        if buffer.starts_with(post_request) {
+            let mut body = vec![];
+            let mut body_length = 0;
+            let buffer = String::from_utf8_lossy(&buffer);
+            let lines = buffer.split("\r\n");
+            let mut found_body = false;
+
+            for line in lines {
+                if found_body {
+                    body.extend_from_slice(line.as_bytes());
+                    body_length += line.len();
+                }
+
+                if line == "" {
+                    found_body = true;
+                }
+            }
+
+            // Process the received JSON data
+            let received_data = String::from_utf8(body).unwrap();
+            let response_data = process_received_data(received_data);
+
+            let response = format!(
+                "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\n\r\n{}",
+                response_data.len(),
+                response_data
+            );
+
+            stream.write(response.as_bytes()).unwrap();
+            stream.flush().unwrap();
+
+            return;
+        }
+
+    } else if crud_type == "PUT" {
+
+    }
+    
 }
 
 
@@ -161,4 +203,18 @@ fn get_content_type(filename: &str) -> &str {
     } else {
         "text/html"
     }
+}
+
+fn process_received_data(data: String) -> String {
+    // Do processing on the received data and return the response
+    // ...
+
+    // get the hashtable location
+    // create the metadata
+    // put the metadata on ipfs
+    // sign the uri
+    // return the uri
+
+    let response = "{\"status\": \"success\"}".to_string();
+    response
 }

@@ -1,26 +1,25 @@
+extern crate num_cpus;
 use std::net::TcpListener;
 use std::net::TcpStream;
 use std::io::{prelude::*};
 use std::fs;
-// use std::thread;
-// use std::time::Duration;
 use server::{ThreadPool, HashTable};
 
 const DEBUGGER: bool = false;
 
-
-
 fn main() {
+    let num_threads: usize = num_cpus::get();
     if DEBUGGER {
         let hashtable: HashTable<String> = HashTable::new(10, "hashtable.bin");
         println!("The Hashtable is: \n{:#?}", hashtable);
+        println!("The number of CPU cores are: {}", num_threads);
     }
 
     let listener = 
         TcpListener::bind("127.0.0.1:7878")
         .unwrap(); // error throw a panic for developement, requires error handling in production
 
-    let pool = ThreadPool::new(4); // SPECIFY THE SERVER MAX THREADS TO PROCESS REQUESTS
+    let pool = ThreadPool::new(num_threads); // SPECIFY THE SERVER MAX THREADS TO PROCESS REQUESTS
 
     for stream in listener.incoming() {
         let stream = stream.unwrap();
@@ -101,7 +100,7 @@ fn handle_connection(mut stream: TcpStream) {
         let mut contents = vec![];
         match file.read_to_end(&mut contents) {
             Ok(_) => {
-                let mut response = format!(
+                let response = format!(
                     "{}\r\nContent-Type: {}\r\nContent-Length: {}\r\n\r\n",
                     status_line,
                     get_content_type(filename_path),

@@ -402,7 +402,7 @@ form fieldset > div.grid__wrapper div label:before {
   opacity: 0;
   transform: scale(0.5);
   transition: all 200ms ease-in-out;
-  z-index: 99999;
+  z-index: 99;
 }
 
 form fieldset > div input:checked + label:before {
@@ -434,7 +434,7 @@ div#preview {
 }
 
 div#preview > #image-box {
-  margin-top: 1.5rem;
+  margin-top: 0.9rem;
   align-self: flex-start;
   width: calc(25vw - 1.5rem);
   height: calc(25vw - 1.5rem);

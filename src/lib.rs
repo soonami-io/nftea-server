@@ -11,10 +11,10 @@ struct QuarkCollectionMetadataStandard {
   name: String,
   image: String,
   description: String,
-  external_url: Option<String>,
-  background_color: Option<String>,
-  animation_url: Option<String>,
-  youtube_url: Option<String>,
+//   external_url: Option<String>,
+//   background_color: Option<String>,
+//   animation_url: Option<String>,
+//   youtube_url: Option<String>,
   origins: Origins,
   attributes: Vec<Attribute>,
 }
@@ -270,41 +270,43 @@ impl<T: Hash + std::clone::Clone + std::cmp::PartialEq + Serialize + for<'a> Des
         }
     }
 
-    fn fill_hashtable(&mut self) -> HashMap<u32, QuarkCollectionMetadataStandard> {
-        for i in 0..10 {
-            let name = format!("Name {}", i);
-            let image = format!("Image {}", i);
-            let description = format!("Description {}", i);
-            let external_url = Some(format!("External URL {}", i));
-            let background_color = Some(format!("Background Color {}", i));
-            let animation_url = Some(format!("Animation URL {}", i));
-            let youtube_url = Some(format!("YouTube URL {}", i));
+    fn fill(&mut self, array.nft_images) -> HashMap<u32, QuarkCollectionMetadataStandard> {
+        
+        
+        for i in 1..self.capacity+1 {
+            let name = format!("name {}", i); console.log(`name ${i}`)
+            let image = format!("{}", array[i]);
+            let description = format!("description {}", i);
+            // let external_url = Some(format!("External URL {}", i));
+            // let background_color = Some(format!("Background Color {}", i));
+            // let animation_url = Some(format!("Animation URL {}", i));
+            // let youtube_url = Some(format!("YouTube URL {}", i));
             let origins = QuarkCollectionMetadataStandard_Origins {
                 template: QuarkCollectionMetadataStandard_Origins_Template {
-                    id: format!("ID {}", i),
-                    name: format!("Name {}", i),
-                    image: format!("Image {}", i),
-                    description: format!("Description {}", i),
+                    id: format!("{}", "1"),
+                    name: format!("mQuark Beverage"),
+                    image: format!("https://ipfs.io/ipfs/QmTxpSbXqB5m7PsnEzofMnVTCoyUCJy1i224t2Kv9WZoa4"),
+                    description: format!("This is a Beverage Template, a simple representation of beverage-typed NFT collections.", i),
                     attributes: Some(vec![
                         QuarkCollectionMetadataStandard_Origins_Template_Attributes {
-                            display_type: Some("boost_percentage"),
-                            trait_type: Some(format!("Trait Type {}", i)),
-                            value: format!("Value {}", i),
-                            value_type: Some(format!("Value Type {}", i)),
-                            max_value: Some(i as u64),
+                            // display_type: Some("boost_percentage"),
+                            trait_type: Some(format!("somevalue {}", 1)),
+                            value: format!("{}", i),
+                            // value_type: Some(format!("Value Type {}", i)),
+                            // max_value: Some(i as u64),
                         },
                     ]),
                 },
                 project: QuarkCollectionMetadataStandard_Origins_Project {
-                    id: format!("ID {}", i),
-                    name: format!("Name {}", i),
+                    id: format!("{}", i),
+                    name: format!("name {}", i),
                     image: format!("Image {}", i),
-                    description: Some(format!("Description {}", i)),
+                    description: Some(format!("description {}", i)),
                 },
                 collection: QuarkCollectionMetadataStandard_Origins_Collection {
-                    id: format!("ID {}", i),
-                    name: format!("Name {}", i),
-                    description: Some(format!("Description {}", i)),
+                    id: format!("1", i),
+                    name: format!("NFT", i),
+                    description: Some(format!("description {}", i)),
                     image: Some(format!("Image {}", i)),
                     variations: "dynamic",
                     attributes: Some(vec![
@@ -320,10 +322,10 @@ impl<T: Hash + std::clone::Clone + std::cmp::PartialEq + Serialize + for<'a> Des
             };
             let attributes = vec![
                 QuarkCollectionMetadataStandard_Attributes {
-                    display_type: Some("boost_percentage"),
+                    // display_type: Some("boost_percentage"),
                     trait_type: Some(format!("Trait Type {}", i)),
                     value: format!("Value {}", i),
-                    max_value: Some(i as u64),
+                    // max_value: Some(i as u64),
                 },
             ];
             let obj = QuarkCollectionMetadataStandard {

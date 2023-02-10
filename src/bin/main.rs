@@ -10,6 +10,83 @@ use std::collections::HashMap;
 
 const DEBUGGER: bool = false;
 
+
+#[derive(Debug)]
+struct QuarkCollectionMetadataStandard {
+  name: String,
+  image: String,
+  description: String,
+  external_url: Option<String>,
+  background_color: Option<String>,
+  animation_url: Option<String>,
+  youtube_url: Option<String>,
+  origins: Origins,
+  attributes: Vec<Attribute>,
+}
+
+#[derive(Debug)]
+struct Origins {
+  template: Template,
+  project: Project,
+  collection: Collection,
+}
+
+#[derive(Debug)]
+struct Template {
+  id: String,
+  name: String,
+  image: String,
+  description: String,
+  attributes: Option<Vec<Attribute>>,
+}
+
+#[derive(Debug)]
+struct Project {
+  id: String,
+  name: String,
+  image: String,
+  description: Option<String>,
+}
+
+#[derive(Debug)]
+struct Collection {
+  id: String,
+  name: String,
+  description: Option<String>,
+  image: Option<String>,
+  variations: Variations,
+  attributes: Vec<Attribute>,
+}
+
+#[derive(Debug)]
+enum Variations {
+  Dynamic,
+  Static(u32),
+}
+
+#[derive(Debug)]
+struct Attribute {
+  display_type: Option<DisplayType>,
+  trait_type: Option<String>,
+  value: AttributeValue,
+  max_value: Option<f32>,
+}
+
+#[derive(Debug)]
+enum DisplayType {
+  BoostPercentage,
+  BoostNumber,
+  Number,
+  Date,
+}
+
+#[derive(Debug)]
+enum AttributeValue {
+  String(String),
+  Number(f32),
+}
+
+
 fn main() {
     let num_threads: usize = num_cpus::get();
     if DEBUGGER {
@@ -231,7 +308,6 @@ fn get_content_type(filename: &str) -> &str {
 fn process_received_data(data: String) -> String {
     // Do processing on the received data and return the response
     // ...
-    
     // Getting the CombinationKey
      let key: Vec<&str> = data.split("=").collect();
      let combination = key[1].trim_end_matches('\0').to_string();
@@ -245,4 +321,6 @@ fn process_received_data(data: String) -> String {
     let response = "{\"status\": \"success\"}".to_string();
     response
 }
+
+
 

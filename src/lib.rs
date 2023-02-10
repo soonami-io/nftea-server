@@ -81,6 +81,11 @@ enum AttributeValue {
   Number(f32),
 }
 
+
+
+
+
+
 // ThreadPool Lib
 type Job = Box<dyn FnOnce() + Send + 'static>;
 
@@ -270,7 +275,7 @@ impl<T: Hash + std::clone::Clone + std::cmp::PartialEq + Serialize + for<'a> Des
         }
     }
 
-    fn fill(&mut self, array.nft_images) -> HashMap<u32, QuarkCollectionMetadataStandard> {
+    fn fill(&mut self, &mut nft_images_array) -> HashMap<u32, QuarkCollectionMetadataStandard> {
         
         
         for i in 1..self.capacity+1 {
@@ -339,7 +344,7 @@ impl<T: Hash + std::clone::Clone + std::cmp::PartialEq + Serialize + for<'a> Des
                 origins,
                 attributes,
             };
-            hashtable.insert(format!("Key {}", i), obj);
+            hashtable.insert(format!("{}", i), obj);
         }        
     }
 

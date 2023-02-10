@@ -1,4 +1,5 @@
 extern crate num_cpus;
+use std::env;
 use std::net::TcpListener;
 use std::net::TcpStream;
 use std::io::{prelude::*};
@@ -86,14 +87,78 @@ enum AttributeValue {
   Number(f32),
 }
 
+// // sign the uri
+let (_eloop, transport) = web3::transports::Http::new("http://localhost:8545").unwrap();
+let web3 = Web3::new(transport);
+
+// // Define the address of your Ethereum account
+let account: Address = "0x1234567890123456789012345678901234567890".parse().unwrap();
+
+
+// // Connect to an Ethereum node in the main thread
+// let (_eloop, transport) = web3::transports::Http::new("http://localhost:8545").unwrap();
+// let web3 = Web3::new(transport);
+
+// // Define the address of the smart contract
+// let contract_address: Address = "0x1234567890123456789012345678901234567890".parse().unwrap();
+
+// // Define the ABI of the smart contract
+// let contract_abi = include_str!("contract.abi");
+
+// // Create an instance of the Contract struct
+// let contract = Contract::from_json(web3.eth(), contract_address, contract_abi).unwrap();
+
+// // Define the filter options for the event
+// let filter_options = Options::default();
+
+// // Listen to the event in the main thread
+// let event = contract.events().event_new_data(filter_options).then(move |event| {
+//     // Get the data from the event
+//     let data = event.unwrap().return_values;
+
+//     // Extract the values from the event data
+//     let value_1: H256 = data.get("value_1").unwrap();
+//     let value_2: U256 = data.get("value_2").unwrap();
+
+//     // Do something with the values
+//     println!("Received event with value_1: {} and value_2: {}", value_1, value_2);
+
+//     Ok(())
+// });
 
 fn main() {
+    // Load the environment variables from the .env file
+    dotenv().ok();
+    
     let num_threads: usize = num_cpus::get();
-    if DEBUGGER {
-        let hashtable: HashTable<String> = HashTable::new(10, "hashtable.bin");
+
+    // Get the Pinata API key from the environment variables
+    let pinata_api_key = env::var("PINATA_API_KEY").expect("PINATA_API_KEY must be set in the .env file");
+    // Get the Pinata secret API key from the environment variables
+    let pinata_secret_api_key = env::var("PINATA_SECRET_API_KEY").expect("PINATA_SECRET_API_KEY must be set in the .env file");
+
+    // Create an instance of the PinataApi struct
+    let pinata_api = PinataApi::new(pinata_api_key, pinata_secret_api_key);
+
+    // Open the file you want to upload
+    // let mut file = File::open("path/to/your/file").unwrap();
+
+    // Read the contents of the file into a buffer
+    // let mut buffer = vec![];
+    // file.read_to_end(&mut buffer).unwrap();
+
+    // Upload the contents of the buffer to Pinata
+    // let response = pinata_api.pin_file_to_ipfs(&buffer[..]).unwrap();
+
+    // Print the IPFS hash of the file
+    // println!("The file was uploaded to IPFS and can be accessed at: https://ipfs.io/ipfs/{}", response.IpfsHash);
+
+    // if DEBUGGER {
+        let hashtable: HashTable<QuarkCollectionMetadataStandard> = HashTable::new(365, "hashtable.bin");
         println!("The Hashtable is: \n{:#?}", hashtable);
         println!("The number of CPU cores are: {}", num_threads);
-    }
+    // }
+    
 
     let listener = 
         TcpListener::bind("127.0.0.1:7878")
@@ -108,6 +173,48 @@ fn main() {
             handle_connection(stream);
         });   
     }
+
+    // Connect to an Ethereum node in the main thread
+    let (_eloop, transport) = web3::transports::Http::new("http://localhost:8545").unwrap();
+    let web3 = Web3::new(transport);
+
+    // Define the address of the smart contract
+    let contract_address: Address = "0x1234567890123456789012345678901234567890".parse().unwrap();
+
+    // Define the ABI of the smart contract
+    let contract_abi = include_str!("contract.abi");
+
+    // Create an instance of the Contract struct
+    let contract = Contract::from_json(web3.eth(), contract_address, contract_abi).unwrap();
+
+    // Define the filter options for the event
+    let filter_options = Options::default();
+
+    // Listen to the event in the main thread
+    let event = contract.events().event_new_data(filter_options).then(move |event| {
+        // Get the data from the event
+        let data = event.unwrap().return_values;
+
+        // Extract the values from the event data
+        let value_1: H256 = data.get("value_1").unwrap();
+        let value_2: U256 = data.get("value_2").unwrap();
+
+        // Do something with the values
+        println!("Received event with value_1: {} and value_2: {}", value_1, value_2);
+
+        Ok(())
+    });
+
+    // Wait for the event to occur
+    web3.eth().transport().wait(event).unwrap();
+
+    // Join the web server thread
+    // server_thread.join().unwrap();
+
+
+    // ?? env
+
+    // ?? IPFS
 }
 
 fn handle_connection(mut stream: TcpStream) {
@@ -305,18 +412,84 @@ fn get_content_type(filename: &str) -> &str {
     }
 }
 
-fn process_received_data(data: String) -> String {
+fn process_received_data(data: String, hashtable: &HashTable<QuarkCollectionMetadataStandard>) -> String {
     // Do processing on the received data and return the response
     // ...
     // Getting the CombinationKey
      let key: Vec<&str> = data.split("=").collect();
      let combination = key[1].trim_end_matches('\0').to_string();
+     
     //  println!("key is: {:#?}", combination);
     // get the hashtable location
-    // create the metadata
+    let QuarkCollectionMetadataStandard = hashtable.search(&combination);
+    let ingredients = combination
+    // Add the ingredients to the metadata
+
+
+
+    // create the metadata 
+
+    // // Create an instance of the PinataApi struct
+    // let pinata_api = PinataApi::new(pinata_api_key, pinata_secret_api_key);
+
+    // // Open the file you want to upload
+    // let mut file = File::open("path/to/your/file").unwrap();
+
+    // // Read the contents of the file into a buffer
+    // let mut buffer = vec![];
+    // file.read_to_end(&mut buffer).unwrap();
+
+    // // Upload the contents of the buffer to Pinata
+    // let response = pinata_api.pin_file_to_ipfs(&buffer[..]).unwrap();
+
+    // // Print the IPFS hash of the file
+    // println!("The file was uploaded to IPFS and can be accessed at: https://ipfs.io/ipfs/{}", response.IpfsHash);
+
     // put the metadata on ipfs
-    // sign the uri
-    // return the uri
+    // HashMap derives serde::Serialize
+    // let mut json_data = HashMap::new();
+    // json_data.insert("name", "user");
+    
+    let result = api.pin_json(PinByJson::new(QuarkCollectionMetadataStandard)).await;
+    
+    if let Ok(pinned_object) = result {
+        let hash = pinned_object.ipfs_hash;
+        
+        let  ipfs_uri=format!(
+            "https://ipfs.io/ipfs/{}", hash
+        )
+        
+        // sign the uri
+        let (_eloop, transport) = web3::transports::Http::new("http://localhost:8545").unwrap();
+        let web3 = Web3::new(transport);
+
+        // Define the address of your Ethereum account
+        // let account: Address = "0x1234567890123456789012345678901234567890".parse().unwrap();
+
+        // Sign the `ipfs_uri` string
+        let signature = web3.eth().sign(account, Some(hash.into()));
+
+        match signature {
+            Ok(signature) => {
+
+                // return the uri
+                
+                // Return the signed `ipfs_uri`
+                // let response = "{\"status\": \"success\"}".to_string();
+                
+                println!("Signed IPFS URI: {}", ipfs_uri);
+                println!("Signature: {:?}", signature);
+                signature
+            }
+            Err(error) => {
+                println!("Error signing IPFS URI: {}", error);
+            }
+        }
+        
+    }
+
+
+    
 
     let response = "{\"status\": \"success\"}".to_string();
     response

@@ -4,6 +4,9 @@ use std::net::TcpStream;
 use std::io::{prelude::*};
 use std::fs;
 use server::{ThreadPool, HashTable};
+use url::Url;
+use std::collections::HashMap;
+
 
 const DEBUGGER: bool = false;
 
@@ -34,8 +37,8 @@ fn handle_connection(mut stream: TcpStream) {
 
     let mut buffer = [0; 1024]; // 1024 bytes long buffer
     stream.read(&mut buffer).unwrap(); // unwrap for panic simplicity incase, switch to error handling for production
-    let (crud_type, path) = extract_path_and_crud(&buffer);
-    
+    let (crud_type, path, queries) = extract_path_and_crud(&buffer);
+    println!("Crud Type is: {}\nPath is: {}, queries are: \n {:#?}", crud_type, path, queries);
     if DEBUGGER {
         println!( 
             "Request {}",
@@ -49,7 +52,7 @@ fn handle_connection(mut stream: TcpStream) {
         let get_home =  b"GET / HTTP/1.1\r\n";
         let get_mint =  b"GET /mint HTTP/1.1\r\n";
         let get_request = format!(
-            "{} {} HTTP/1.1\r\n",
+            "{} /{} HTTP/1.1\r\n",
             crud_type,
             path
         );
@@ -138,30 +141,35 @@ fn handle_connection(mut stream: TcpStream) {
         stream.write(&response).unwrap();
         stream.flush().unwrap();
     } else if crud_type == "POST" {
+        let coming_request = format!(
+            "{} /{} HTTP/1.1\r\n",
+            crud_type,
+            path
+        );
         let post_request = b"POST /api/uri HTTP/1.1\r\n";
 
-        if buffer.starts_with(post_request) {
+        if coming_request.as_bytes().starts_with(post_request) {
             let mut body = vec![];
             let mut body_length = 0;
             let buffer = String::from_utf8_lossy(&buffer);
             let lines = buffer.split("\r\n");
             let mut found_body = false;
-
+            
             for line in lines {
                 if found_body {
                     body.extend_from_slice(line.as_bytes());
                     body_length += line.len();
                 }
-
+                
                 if line == "" {
                     found_body = true;
                 }
             }
-
+            
             // Process the received JSON data
             let received_data = String::from_utf8(body).unwrap();
             let response_data = process_received_data(received_data);
-
+            
             let response = format!(
                 "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\n\r\n{}",
                 response_data.len(),
@@ -182,13 +190,28 @@ fn handle_connection(mut stream: TcpStream) {
 
 
 // TODO: Adding Parameter to Here
-fn extract_path_and_crud(buffer: &[u8]) -> (String, String) {
+fn extract_path_and_crud(buffer: &[u8]) -> (String, String, HashMap<String, String>) {
     let reader = String::from_utf8_lossy(&buffer[..]);
+    
     let request_line_segments: Vec<&str> = reader.split(" ").collect();
     let crud_type = request_line_segments[0].to_string();
-    let path = request_line_segments[1].to_string();
-
-    (crud_type, path)
+    let absolute_url = format!(
+        "http://127.0.0.1:7878{}",
+        request_line_segments[1]
+    );
+    let url = Url::parse(absolute_url.as_str()).expect("Invalid URL");
+    let path = url.path().to_owned().expect("Path is not correctly set");
+    let queries = match url.query_pairs() {
+        Some(pairs) => pairs
+            .into_iter()
+            .collect::<HashMap<_, _>>(),
+        None => {
+            println!("No url params were passed");
+            HashMap::new()
+        }
+    };
+    
+    (crud_type, path.join("/"), queries)
 }
 
 fn get_content_type(filename: &str) -> &str {
@@ -208,7 +231,11 @@ fn get_content_type(filename: &str) -> &str {
 fn process_received_data(data: String) -> String {
     // Do processing on the received data and return the response
     // ...
-
+    
+    // Getting the CombinationKey
+     let key: Vec<&str> = data.split("=").collect();
+     let combination = key[1].trim_end_matches('\0').to_string();
+    //  println!("key is: {:#?}", combination);
     // get the hashtable location
     // create the metadata
     // put the metadata on ipfs
@@ -218,3 +245,4 @@ fn process_received_data(data: String) -> String {
     let response = "{\"status\": \"success\"}".to_string();
     response
 }
+

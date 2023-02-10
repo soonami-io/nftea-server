@@ -277,48 +277,74 @@ impl<T: Hash + std::clone::Clone + std::cmp::PartialEq + Serialize + for<'a> Des
 
     fn fill(&mut self, nft_images_array &mut `HashMap<u32, String>) -> HashMap<u32, QuarkCollectionMetadataStandard> {
         for i in 1..self.capacity+1 {
-            let name = format!("name {}", i);
-            let image = format!("{}", array[i]);
-            let description = format!("description {}", i);
+            let name = format!("NFTea");
+            let image = format!("{}", array[i]);//is this correct?=> array[i] or i ?? <<<<==== Davood =>>>>>>>>
+            let description = format!("Our NFTeas are truly special blend utilising the power of mQuark , they are more than an image,  they are transformed into living, breathing pieces of art, each with its own unique flavour and personality. Infinitely upgradable through this metadata they offer true interoperability - take them anywhere!");
             // let external_url = Some(format!("External URL {}", i));
             // let background_color = Some(format!("Background Color {}", i));
             // let animation_url = Some(format!("Animation URL {}", i));
             // let youtube_url = Some(format!("YouTube URL {}", i));
             let origins = QuarkCollectionMetadataStandard_Origins {
                 template: QuarkCollectionMetadataStandard_Origins_Template {
-                    id: format!("{}", "1"),
+                    id: format!("1"),
                     name: format!("mQuark Beverage"),
                     image: format!("https://ipfs.io/ipfs/QmTxpSbXqB5m7PsnEzofMnVTCoyUCJy1i224t2Kv9WZoa4"),
                     description: format!("This is a Beverage Template, a simple representation of beverage-typed NFT collections.", i),
                     attributes: Some(vec![
                         QuarkCollectionMetadataStandard_Origins_Template_Attributes {
-                            // display_type: Some("boost_percentage"),
-                            trait_type: Some(format!("somevalue {}", 1)),
-                            value: format!("{}", i),
-                            // value_type: Some(format!("Value Type {}", i)),
-                            // max_value: Some(i as u64),
+                            value: format!("Type"),
+                        },
+                        QuarkCollectionMetadataStandard_Origins_Template_Attributes {
+                            value: format!("Temperature"),
+                        },
+                        QuarkCollectionMetadataStandard_Origins_Template_Attributes {
+                            value: format!("Ingredient Type"),
+                        },
+                        QuarkCollectionMetadataStandard_Origins_Template_Attributes {
+                            value: format!("Sweetness Level"),
+                        },
+                        QuarkCollectionMetadataStandard_Origins_Template_Attributes {
+                            value: format!("Size"),
+                        },
+                        QuarkCollectionMetadataStandard_Origins_Template_Attributes {
+                            value: format!("Milk Type"),
+                        },
+                        QuarkCollectionMetadataStandard_Origins_Template_Attributes {
+                            value: format!("Effect"),
+                        },
+                        QuarkCollectionMetadataStandard_Origins_Template_Attributes {
+                            value: format!("Container"),
+                        },
+                        QuarkCollectionMetadataStandard_Origins_Template_Attributes {
+                            value: format!("Rarity"),
                         },
                     ]),
                 },
                 project: QuarkCollectionMetadataStandard_Origins_Project {
-                    id: format!("{}", i),
-                    name: format!("name {}", i),
-                    image: format!("Image {}", i),
-                    description: Some(format!("description {}", i)),
+                    id: format!("1"),
+                    name: format!("Flying Fish Tea Co."),
+                    image: format!("https://cdn.shopify.com/s/files/1/0531/1116/0993/files/green_logo-2-2-2-2-2_140x.jpg?v=1636920599", i),
+                    description: Some(format!("https://www.flyingfishtea.co.uk/")),
                 },
                 collection: QuarkCollectionMetadataStandard_Origins_Collection {
-                    id: format!("1", i),
-                    name: format!("NFT", i),
-                    description: Some(format!("description {}", i)),
-                    image: Some(format!("Image {}", i)),
+                    id: format!("1"),
+                    name: format!("NFTea"),
+                    description: Some(format!("Once upon a time, in a land where teas were kings, six unique ones lived together in harmony. Black tea, White tea, Green tea, Rooibos tea, Pu-erh tea, and Oolong tea each had their own special qualities and lived in separate tea gardens, content with their daily routines. But one day, they heard whispers of a revolutionary new world, a place where they could become more than just tea - the world of Web3.
+                                        Excited by the prospect of becoming something truly unique, the teas decided to embark on a journey together to discover this magical land. Along the way, they gathered special ingredients to enhance their flavors and make themselves stand out from the rest.
+                                        Finally, they arrived at the entrance to the Web3 world - a sprawling marketplace filled with opportunities and challenges. As they explored this new and exciting place, they discovered that they could use blockchain technology to create unique digital representations of themselves, each with their own special blend of ingredients.
+                                        The teas worked tirelessly, perfecting their digital creations and blending themselves with the finest ingredients. And soon, they were transformed into living, breathing pieces of art, each with its own unique flavor and personality.
+                                        As they explored the Web3 world, they encountered other digital creations and formed friendships with them. They learned that they could trade their digital representations with others and that their creations would live forever, becoming a part of Web3's rich history.
+                                        And so, the six teas lived happily ever after, continuing to explore the wonders of web3 and sharing their unique creations with the world. They knew that they would never forget their journey and the lessons they had learned along the way."
+                                    )),
+                    image: Some(format!("{}", i)),
                     variations: "dynamic",
                     attributes: Some(vec![
                         QuarkCollectionMetadataStandard_Origins_Collection_Attributes {
-                            display_type: Some("boost_percentage"),
-                            trait_type: Some(format!("Trait Type {}", i)),
-                            value: format!("Value {}", i),
-                            value_type: Some(format!("Value Type {}", i)),
-                            max_value: Some(i as u64),
+                            // display_type: Some("boost_percentage"),
+                            trait_type: Some(format!("{}", i)),
+                            value: format!("{}", i),
+                            // value_type: Some(format!("Value Type {}", i)),
+                            // max_value: Some(i as u64),
                         },
                     ]),
                 },
@@ -326,8 +352,8 @@ impl<T: Hash + std::clone::Clone + std::cmp::PartialEq + Serialize + for<'a> Des
             let attributes = vec![
                 QuarkCollectionMetadataStandard_Attributes {
                     // display_type: Some("boost_percentage"),
-                    trait_type: Some(format!("Trait Type {}", i)),
-                    value: format!("Value {}", i),
+                    trait_type: Some(format!("{}", i)),
+                    value: format!("{}", i),
                     // max_value: Some(i as u64),
                 },
             ];
@@ -335,10 +361,10 @@ impl<T: Hash + std::clone::Clone + std::cmp::PartialEq + Serialize + for<'a> Des
                 name,
                 image,
                 description,
-                external_url,
-                background_color,
-                animation_url,
-                youtube_url,
+                // external_url,
+                // background_color,
+                // animation_url,
+                // youtube_url,
                 origins,
                 attributes,
             };

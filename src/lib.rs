@@ -275,11 +275,9 @@ impl<T: Hash + std::clone::Clone + std::cmp::PartialEq + Serialize + for<'a> Des
         }
     }
 
-    fn fill(&mut self, &mut nft_images_array) -> HashMap<u32, QuarkCollectionMetadataStandard> {
-        
-        
+    fn fill(&mut self, nft_images_array &mut `HashMap<u32, String>) -> HashMap<u32, QuarkCollectionMetadataStandard> {
         for i in 1..self.capacity+1 {
-            let name = format!("name {}", i); console.log(`name ${i}`)
+            let name = format!("name {}", i);
             let image = format!("{}", array[i]);
             let description = format!("description {}", i);
             // let external_url = Some(format!("External URL {}", i));

@@ -103,7 +103,7 @@ let account: Address = "0x1234567890123456789012345678901234567890".parse().unwr
 // let contract_address: Address = "0x1234567890123456789012345678901234567890".parse().unwrap();
 
 // // Define the ABI of the smart contract
-// let contract_abi = include_str!("contract.abi");
+let contract_abi = include_str!("contract.abi"); // warapper contract 
 
 // // Create an instance of the Contract struct
 // let contract = Contract::from_json(web3.eth(), contract_address, contract_abi).unwrap();
@@ -198,6 +198,10 @@ fn main() {
         // Extract the values from the event data
         let value_1: H256 = data.get("value_1").unwrap();
         let value_2: U256 = data.get("value_2").unwrap();
+
+
+        // TODO: delete based on minted item on the blockchain.
+        // hashtable.delete()
 
         // Do something with the values
         println!("Received event with value_1: {} and value_2: {}", value_1, value_2);
@@ -416,14 +420,17 @@ fn process_received_data(data: String, hashtable: &HashTable<QuarkCollectionMeta
     // Do processing on the received data and return the response
     // ...
     // Getting the CombinationKey
+    // conmbination=balcktea+whitetea+pineapple+jasmine
      let key: Vec<&str> = data.split("=").collect();
      let combination = key[1].trim_end_matches('\0').to_string();
      
     //  println!("key is: {:#?}", combination);
     // get the hashtable location
-    let QuarkCollectionMetadataStandard = hashtable.search(&combination);
-    let ingredients = combination
+
+    let QuarkCollectionMetadataStandard = hashtable.search(&combination); 
+    // let ingredients = combination add the ingridents to the metadata
     // Add the ingredients to the metadata
+
 
 
 
@@ -450,13 +457,13 @@ fn process_received_data(data: String, hashtable: &HashTable<QuarkCollectionMeta
     // let mut json_data = HashMap::new();
     // json_data.insert("name", "user");
     
-    let result = api.pin_json(PinByJson::new(QuarkCollectionMetadataStandard)).await;
+    let result = pinata_api.pin_json(PinByJson::new(QuarkCollectionMetadataStandard)).await;
     
     if let Ok(pinned_object) = result {
         let hash = pinned_object.ipfs_hash;
         
         let  ipfs_uri=format!(
-            "https://ipfs.io/ipfs/{}", hash
+            "ipfs://{}", hash
         )
         
         // sign the uri
@@ -467,19 +474,22 @@ fn process_received_data(data: String, hashtable: &HashTable<QuarkCollectionMeta
         // let account: Address = "0x1234567890123456789012345678901234567890".parse().unwrap();
 
         // Sign the `ipfs_uri` string
-        let signature = web3.eth().sign(account, Some(hash.into()));
+        let signature = web3.eth().sign(account, Some(ipfs_uri.into()));
 
         match signature {
             Ok(signature) => {
 
                 // return the uri
-                
+
                 // Return the signed `ipfs_uri`
                 // let response = "{\"status\": \"success\"}".to_string();
+                let response = hash_map.new();
+                response.insert("ipfs_uri", ipfs_uri);
+                response.insert("signature", signature);
                 
                 println!("Signed IPFS URI: {}", ipfs_uri);
                 println!("Signature: {:?}", signature);
-                signature
+                response // this is the last lone of our code for backend.
             }
             Err(error) => {
                 println!("Error signing IPFS URI: {}", error);

@@ -25,6 +25,9 @@ header {
   height: 5rem;
   background-color: hsl(169, 33%, 66%);
 }
+a {
+  color: hsl(164, 60%, 24%);
+}
 
 header nav {
   display: grid;

@@ -259,8 +259,15 @@ const app_component = {
     //call backend here
     brew_tea: async function () {
       let initialValue = "";
-      let result = this.nft_combination.reduce((accumulator, currentValue) => accumulator.concat(currentValue.name), initialValue);
+      console.log("test=>" ,this.nft_combination)
+      if(this.nft_combination == "") {
+        window.alert("Please select at least a one ingredient!")
+        return;
+      }
+      let result = this.nft_combination.reduce((accumulator, currentValue) => accumulator.concat(currentValue.name+"+"), initialValue);
+      result = result.substring(0, result.length - 1);
       console.log(result.replace(/\s/g, ""));
+
       //call backend get the response
       this.backend_response.signer = "0xC52d3ECB7F84A27c68541933FDd5b74b96334c05";
       this.backend_response.signature ="0x"+"0f2a92500c9ffd53ddfd52f1b34de8f2abad64fbee12220d9499200b2d2b62fd0c721d43c09b0e27db3ad1c3b7f6e5def6dc401d09b0fa15e69feec2711e37001b";

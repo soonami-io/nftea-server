@@ -276,7 +276,7 @@ impl<T: Hash + std::clone::Clone + std::cmp::PartialEq + Serialize + for<'a> Des
         for i in 1..self.capacity+1 {
             let name = format!("NFTea");
             let image = format!("{}", array[i]);//is this correct?=> array[i] or i ?? <<<<==== Davood =>>>>>>>>
-            let description = format!("NFTea is a unique collection that can have multiple URIs and Interoperability.", i);
+            let description = format!("Our NFTeas are truly special blend utilising the power of mQuark , they are more than an image,  they are transformed into living, breathing pieces of art, each with its own unique flavour and personality. Infinitely upgradable through this metadata they offer true interoperability - take them anywhere!");
             // let external_url = Some(format!("External URL {}", i));
             // let background_color = Some(format!("Background Color {}", i));
             // let animation_url = Some(format!("Animation URL {}", i));

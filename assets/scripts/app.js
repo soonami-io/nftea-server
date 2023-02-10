@@ -140,7 +140,7 @@ const app_component = {
       random_primary_index: 0,
       wallet_address: null,
       web3_connected: false,
-      payment_contract_address: "0x12CB33d84E119EE06Ad2BcDea0bb269E04cf373e",
+      payment_contract_address: "0x874908964FA2fF017947B880E2C9fef95bb98F66",
       mquark_contract_address: "0x50Fbd77919F74777967fEFB45a7Edad0aD5025C1",
       payment_abi: abi,
       _mquark_abi: mquark_abi,
@@ -151,6 +151,7 @@ const app_component = {
       transactionLoading: false,
       transactionSuccess: false,
       mintedNftCount: 0,
+      totalContributedAmount: 0
     };
   },
   computed: {
@@ -262,9 +263,9 @@ const app_component = {
       console.log(result.replace(/\s/g, ""));
       //call backend get the response
       this.backend_response.signer = "0xC52d3ECB7F84A27c68541933FDd5b74b96334c05";
-      this.backend_response.signature = "0xce85d4f55dd42b09883704961a9c1374303bb09b093b84f0ecc0f0b355c0848237054c93254d933dc1cd9b1adbca0b2d45a548ccf2b131af3379469d75be27241c";
+      this.backend_response.signature ="0x"+"0f2a92500c9ffd53ddfd52f1b34de8f2abad64fbee12220d9499200b2d2b62fd0c721d43c09b0e27db3ad1c3b7f6e5def6dc401d09b0fa15e69feec2711e37001b";
       this.backend_response.uri = "https://mquark.infura-ipfs.io/ipfs/QmaPvrGQWjNQNSmPt5bbK7bGMorHooxhAXZZqRMnmSmssN";
-      this.backend_response.salt = "0x18";
+      this.backend_response.salt = "0x21";
 
       this.brewed_tea = "./assets/image/dalle.png";
     },
@@ -278,11 +279,11 @@ const app_component = {
       const signer = provider.getSigner();
       const payment_contract = new ethers.Contract(this.payment_contract_address, this.payment_abi, signer);
       try {
-        if (this.contribution <= 0) {
-          window.alert("The contribution should be higher than 0, or you can mint for free on the left button.");
+        if (this.contribution < 0) {
+          window.alert("The contribution can't be a minus value, or you can mint for free on the left button.");
           return;
         }
-        let tx = await payment_contract.voluntarilyPayment(
+        let tx = await payment_contract.voluntaryContributionMint(
           this.backend_response.signer,
           this.backend_response.projectId,
           this.backend_response.templateId,
@@ -292,38 +293,40 @@ const app_component = {
           this.backend_response.salt,
           { value: ethers.utils.parseEther(this.contribution) }
         );
+        this.contribution = 0;
         this.set_transaction_loading();
         await tx.wait();
         this.set_transaction_success();
+        this.mounted();
       } catch (error) {
         if (error.message == "MetaMask Tx Signature: User denied transaction signature.")  console.log(error.message);
-        else window.alert("An error happened sending the transaction. Please check your balance is enough for the contribution.");
+        else window.alert("An error happened. Please check your balance is enough for the contribution or you may have already minted one!");
       }
     },
-    mint_free: async function () {
-      console.log("send without contribution");
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      const mquark_contract = new ethers.Contract(this.mquark_contract_address, this._mquark_abi, signer);
-      try {
-        let tx = await mquark_contract.mintFreeWithPreURI(
-          this.backend_response.signer,
-          this.backend_response.projectId,
-          this.backend_response.templateId,
-          this.backend_response.collectionId,
-          this.backend_response.signature,
-          this.backend_response.uri,
-          this.backend_response.salt
-        );
-        this.set_transaction_loading();
-        await tx.wait()
-        this.set_transaction_success()
-      } catch (error) {
-        if (error.message == "MetaMask Tx Signature: User denied transaction signature.")  console.log(error.message);
-        else window.alert("An error happened sending the transaction. Please check your balance is enough for the contribution.");
+    // mint_free: async function () {
+    //   console.log("send without contribution");
+    //   const provider = new ethers.providers.Web3Provider(window.ethereum);
+    //   const signer = provider.getSigner();
+    //   const mquark_contract = new ethers.Contract(this.mquark_contract_address, this._mquark_abi, signer);
+    //   try {
+    //     let tx = await mquark_contract.mintFreeWithPreURI(
+    //       this.backend_response.signer,
+    //       this.backend_response.projectId,
+    //       this.backend_response.templateId,
+    //       this.backend_response.collectionId,
+    //       this.backend_response.signature,
+    //       this.backend_response.uri,
+    //       this.backend_response.salt
+    //     );
+    //     this.set_transaction_loading();
+    //     await tx.wait()
+    //     this.set_transaction_success()
+    //   } catch (error) {
+    //     if (error.message == "MetaMask Tx Signature: User denied transaction signature.")  console.log(error.message);
+    //     else window.alert("An error happened sending the transaction. Please check your balance is enough for the contribution.");
        
-      }
-    },
+    //   }
+    // },
     setContribution: function (amount) {
       this.contribution = amount;
       console.log(amount);
@@ -346,8 +349,15 @@ const app_component = {
   mounted: async function () {
     const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.g.alchemy.com/v2/6C2ub0-l9nAs7qb_17wH8OVfs0ECYfGC");
     const mquark_contract = new ethers.Contract(this.mquark_contract_address, this._mquark_abi, provider);
+    const payment_contract = new ethers.Contract(this.payment_contract_address, this.payment_abi, provider);
+
+    //! update here after deploying to mainnet
     let result = await mquark_contract.getProjectCollection("1", "1", "4");
     this.mintedNftCount = result.mintCount.toString();
+
+    let _totalContributedAmount = await payment_contract.getTotalContribution();
+    this.totalContributedAmount = ethers.utils.formatEther(_totalContributedAmount);
+    
   },
 };
 

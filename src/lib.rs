@@ -4,6 +4,82 @@ use serde::{Serialize, Deserialize};
 use std::fs::File;
 use std::io::{BufReader, BufWriter, Write, Read};
 use bincode::{serialize, deserialize};
+use std::collections::HashMap;
+
+#[derive(Debug)]
+struct QuarkCollectionMetadataStandard {
+  name: String,
+  image: String,
+  description: String,
+  external_url: Option<String>,
+  background_color: Option<String>,
+  animation_url: Option<String>,
+  youtube_url: Option<String>,
+  origins: Origins,
+  attributes: Vec<Attribute>,
+}
+
+#[derive(Debug)]
+struct Origins {
+  template: Template,
+  project: Project,
+  collection: Collection,
+}
+
+#[derive(Debug)]
+struct Template {
+  id: String,
+  name: String,
+  image: String,
+  description: String,
+  attributes: Option<Vec<Attribute>>,
+}
+
+#[derive(Debug)]
+struct Project {
+  id: String,
+  name: String,
+  image: String,
+  description: Option<String>,
+}
+
+#[derive(Debug)]
+struct Collection {
+  id: String,
+  name: String,
+  description: Option<String>,
+  image: Option<String>,
+  variations: Variations,
+  attributes: Vec<Attribute>,
+}
+
+#[derive(Debug)]
+enum Variations {
+  Dynamic,
+  Static(u32),
+}
+
+#[derive(Debug)]
+struct Attribute {
+  display_type: Option<DisplayType>,
+  trait_type: Option<String>,
+  value: AttributeValue,
+  max_value: Option<f32>,
+}
+
+#[derive(Debug)]
+enum DisplayType {
+  BoostPercentage,
+  BoostNumber,
+  Number,
+  Date,
+}
+
+#[derive(Debug)]
+enum AttributeValue {
+  String(String),
+  Number(f32),
+}
 
 // ThreadPool Lib
 type Job = Box<dyn FnOnce() + Send + 'static>;
@@ -192,6 +268,77 @@ impl<T: Hash + std::clone::Clone + std::cmp::PartialEq + Serialize + for<'a> Des
             self.data[new_position] = Some(item);
             position = (position + 1) % self.capacity;
         }
+    }
+
+    fn fill_hashtable(&mut self) -> HashMap<u32, QuarkCollectionMetadataStandard> {
+        for i in 0..10 {
+            let name = format!("Name {}", i);
+            let image = format!("Image {}", i);
+            let description = format!("Description {}", i);
+            let external_url = Some(format!("External URL {}", i));
+            let background_color = Some(format!("Background Color {}", i));
+            let animation_url = Some(format!("Animation URL {}", i));
+            let youtube_url = Some(format!("YouTube URL {}", i));
+            let origins = QuarkCollectionMetadataStandard_Origins {
+                template: QuarkCollectionMetadataStandard_Origins_Template {
+                    id: format!("ID {}", i),
+                    name: format!("Name {}", i),
+                    image: format!("Image {}", i),
+                    description: format!("Description {}", i),
+                    attributes: Some(vec![
+                        QuarkCollectionMetadataStandard_Origins_Template_Attributes {
+                            display_type: Some("boost_percentage"),
+                            trait_type: Some(format!("Trait Type {}", i)),
+                            value: format!("Value {}", i),
+                            value_type: Some(format!("Value Type {}", i)),
+                            max_value: Some(i as u64),
+                        },
+                    ]),
+                },
+                project: QuarkCollectionMetadataStandard_Origins_Project {
+                    id: format!("ID {}", i),
+                    name: format!("Name {}", i),
+                    image: format!("Image {}", i),
+                    description: Some(format!("Description {}", i)),
+                },
+                collection: QuarkCollectionMetadataStandard_Origins_Collection {
+                    id: format!("ID {}", i),
+                    name: format!("Name {}", i),
+                    description: Some(format!("Description {}", i)),
+                    image: Some(format!("Image {}", i)),
+                    variations: "dynamic",
+                    attributes: Some(vec![
+                        QuarkCollectionMetadataStandard_Origins_Collection_Attributes {
+                            display_type: Some("boost_percentage"),
+                            trait_type: Some(format!("Trait Type {}", i)),
+                            value: format!("Value {}", i),
+                            value_type: Some(format!("Value Type {}", i)),
+                            max_value: Some(i as u64),
+                        },
+                    ]),
+                },
+            };
+            let attributes = vec![
+                QuarkCollectionMetadataStandard_Attributes {
+                    display_type: Some("boost_percentage"),
+                    trait_type: Some(format!("Trait Type {}", i)),
+                    value: format!("Value {}", i),
+                    max_value: Some(i as u64),
+                },
+            ];
+            let obj = QuarkCollectionMetadataStandard {
+                name,
+                image,
+                description,
+                external_url,
+                background_color,
+                animation_url,
+                youtube_url,
+                origins,
+                attributes,
+            };
+            hashtable.insert(format!("Key {}", i), obj);
+        }        
     }
 
 }

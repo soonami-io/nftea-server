@@ -147,10 +147,8 @@ fn handle_connection(mut stream: TcpStream) {
             path
         );
         let post_request = b"POST /api/uri HTTP/1.1\r\n";
-        
-        println!("hello from heere: {}", coming_request);
+
         if coming_request.as_bytes().starts_with(post_request) {
-            println!("hello from before return");
             let mut body = vec![];
             let mut body_length = 0;
             let buffer = String::from_utf8_lossy(&buffer);
@@ -201,9 +199,17 @@ fn extract_path_and_crud(buffer: &[u8]) -> (String, String, HashMap<String, Stri
         "http://127.0.0.1:7878{}",
         request_line_segments[1]
     );
-    let url = Url::parse(absolute_url.as_str()).expect("Path is not correctly set");
+    let url = Url::parse(absolute_url.as_str()).expect("Invalid URL");
     let path = url.path().to_owned().expect("Path is not correctly set");
-    let queries = url.query_pairs().unwrap().into_iter().collect::<HashMap<_, _>>();
+    let queries = match url.query_pairs() {
+        Some(pairs) => pairs
+            .into_iter()
+            .collect::<HashMap<_, _>>(),
+        None => {
+            println!("No url params were passed");
+            HashMap::new()
+        }
+    };
     
     (crud_type, path.join("/"), queries)
 }
@@ -225,7 +231,11 @@ fn get_content_type(filename: &str) -> &str {
 fn process_received_data(data: String) -> String {
     // Do processing on the received data and return the response
     // ...
-    println!("data is: {}", data);
+    
+    // Getting the CombinationKey
+     let key: Vec<&str> = data.split("=").collect();
+     let combination = key[1].trim_end_matches('\0').to_string();
+    //  println!("key is: {:#?}", combination);
     // get the hashtable location
     // create the metadata
     // put the metadata on ipfs
@@ -235,3 +245,4 @@ fn process_received_data(data: String) -> String {
     let response = "{\"status\": \"success\"}".to_string();
     response
 }
+

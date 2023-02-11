@@ -1,4 +1,8 @@
 extern crate num_cpus;
+extern crate serde;
+extern crate serde_json;
+use serde::{Serialize, Deserialize};
+use dotenv::dotenv;
 use std::env;
 use std::net::TcpListener;
 use std::net::TcpStream;
@@ -7,41 +11,69 @@ use std::fs;
 use server::{ThreadPool, HashTable};
 use url::Url;
 use std::collections::HashMap;
+use pinata_sdk::{ApiError, PinataApi, PinByJson};
+// use ethereum_types::{Address, H256, U256};
+// use ethereum_rust::keccak256;
+// use ethereum_rust::signer::{self, SigningError};
+use hex::{encode};
+use ethers_signers::{LocalWallet, Signer};
+use std::convert::TryFrom;
+
+#[derive(Debug)]
+enum SigningError {
+    FromHexError(hex::FromHexError),
+    SigningError(ethers_signers::error::Error),
+}
+
+impl From<hex::FromHexError> for SigningError {
+    fn from(error: hex::FromHexError) -> Self {
+        SigningError::FromHexError(error)
+    }
+}
+
+impl From<ethers_signers::error::Error> for SigningError {
+    fn from(error: ethers_signers::error::Error) -> Self {
+        SigningError::SigningError(error)
+    }
+}
 
 
 const DEBUGGER: bool = false;
 
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug)]
+struct SignedURIResponse {
+  signature: String,
+  ipfs_uri: String,
+  metadata: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 struct QuarkCollectionMetadataStandard {
   name: String,
   image: String,
   description: String,
-  external_url: Option<String>,
-  background_color: Option<String>,
-  animation_url: Option<String>,
-  youtube_url: Option<String>,
   origins: Origins,
   attributes: Vec<Attribute>,
 }
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 struct Origins {
   template: Template,
   project: Project,
   collection: Collection,
 }
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 struct Template {
   id: String,
   name: String,
   image: String,
   description: String,
-  attributes: Option<Vec<Attribute>>,
+  attributes: Option<Vec<AttributeValueOnly>>,
 }
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 struct Project {
   id: String,
   name: String,
@@ -49,31 +81,34 @@ struct Project {
   description: Option<String>,
 }
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 struct Collection {
   id: String,
   name: String,
   description: Option<String>,
   image: Option<String>,
-  variations: Variations,
+  variations: String,
   attributes: Vec<Attribute>,
 }
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 enum Variations {
   Dynamic,
   Static(u32),
 }
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 struct Attribute {
-  display_type: Option<DisplayType>,
-  trait_type: Option<String>,
-  value: AttributeValue,
-  max_value: Option<f32>,
+  trait_type: Option<String>, // ingrident
+  value: String, // e.g. blacktea
 }
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug)]
+struct AttributeValueOnly {
+      value: String, // e.g. blacktea
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 enum DisplayType {
   BoostPercentage,
   BoostNumber,
@@ -81,85 +116,14 @@ enum DisplayType {
   Date,
 }
 
-#[derive(Debug)]
-enum AttributeValue {
-  String(String),
-  Number(f32),
+  
+fn load_env() {
+    dotenv().ok();
 }
 
-// // sign the uri
-let (_eloop, transport) = web3::transports::Http::new("http://localhost:8545").unwrap();
-let web3 = Web3::new(transport);
-
-// // Define the address of your Ethereum account
-let account: Address = "0x1234567890123456789012345678901234567890".parse().unwrap();
-
-
-// // Connect to an Ethereum node in the main thread
-// let (_eloop, transport) = web3::transports::Http::new("http://localhost:8545").unwrap();
-// let web3 = Web3::new(transport);
-
-// // Define the address of the smart contract
-// let contract_address: Address = "0x1234567890123456789012345678901234567890".parse().unwrap();
-
-// // Define the ABI of the smart contract
-let contract_abi = include_str!("contract.abi"); // warapper contract 
-
-// // Create an instance of the Contract struct
-// let contract = Contract::from_json(web3.eth(), contract_address, contract_abi).unwrap();
-
-// // Define the filter options for the event
-// let filter_options = Options::default();
-
-// // Listen to the event in the main thread
-// let event = contract.events().event_new_data(filter_options).then(move |event| {
-//     // Get the data from the event
-//     let data = event.unwrap().return_values;
-
-//     // Extract the values from the event data
-//     let value_1: H256 = data.get("value_1").unwrap();
-//     let value_2: U256 = data.get("value_2").unwrap();
-
-//     // Do something with the values
-//     println!("Received event with value_1: {} and value_2: {}", value_1, value_2);
-
-//     Ok(())
-// });
-
 fn main() {
-    // Load the environment variables from the .env file
-    dotenv().ok();
-    
+
     let num_threads: usize = num_cpus::get();
-
-    // Get the Pinata API key from the environment variables
-    let pinata_api_key = env::var("PINATA_API_KEY").expect("PINATA_API_KEY must be set in the .env file");
-    // Get the Pinata secret API key from the environment variables
-    let pinata_secret_api_key = env::var("PINATA_SECRET_API_KEY").expect("PINATA_SECRET_API_KEY must be set in the .env file");
-
-    // Create an instance of the PinataApi struct
-    let pinata_api = PinataApi::new(pinata_api_key, pinata_secret_api_key);
-
-    // Open the file you want to upload
-    // let mut file = File::open("path/to/your/file").unwrap();
-
-    // Read the contents of the file into a buffer
-    // let mut buffer = vec![];
-    // file.read_to_end(&mut buffer).unwrap();
-
-    // Upload the contents of the buffer to Pinata
-    // let response = pinata_api.pin_file_to_ipfs(&buffer[..]).unwrap();
-
-    // Print the IPFS hash of the file
-    // println!("The file was uploaded to IPFS and can be accessed at: https://ipfs.io/ipfs/{}", response.IpfsHash);
-
-    // if DEBUGGER {
-        let hashtable: HashTable<QuarkCollectionMetadataStandard> = HashTable::new(365, "hashtable.bin");
-        println!("The Hashtable is: \n{:#?}", hashtable);
-        println!("The number of CPU cores are: {}", num_threads);
-    // }
-    
-
     let listener = 
         TcpListener::bind("127.0.0.1:7878")
         .unwrap(); // error throw a panic for developement, requires error handling in production
@@ -173,52 +137,6 @@ fn main() {
             handle_connection(stream);
         });   
     }
-
-    // Connect to an Ethereum node in the main thread
-    let (_eloop, transport) = web3::transports::Http::new("http://localhost:8545").unwrap();
-    let web3 = Web3::new(transport);
-
-    // Define the address of the smart contract
-    let contract_address: Address = "0x1234567890123456789012345678901234567890".parse().unwrap();
-
-    // Define the ABI of the smart contract
-    let contract_abi = include_str!("contract.abi");
-
-    // Create an instance of the Contract struct
-    let contract = Contract::from_json(web3.eth(), contract_address, contract_abi).unwrap();
-
-    // Define the filter options for the event
-    let filter_options = Options::default();
-
-    // Listen to the event in the main thread
-    let event = contract.events().event_new_data(filter_options).then(move |event| {
-        // Get the data from the event
-        let data = event.unwrap().return_values;
-
-        // Extract the values from the event data
-        let value_1: H256 = data.get("value_1").unwrap();
-        let value_2: U256 = data.get("value_2").unwrap();
-
-
-        // TODO: delete based on minted item on the blockchain.
-        // hashtable.delete()
-
-        // Do something with the values
-        println!("Received event with value_1: {} and value_2: {}", value_1, value_2);
-
-        Ok(())
-    });
-
-    // Wait for the event to occur
-    web3.eth().transport().wait(event).unwrap();
-
-    // Join the web server thread
-    // server_thread.join().unwrap();
-
-
-    // ?? env
-
-    // ?? IPFS
 }
 
 fn handle_connection(mut stream: TcpStream) {
@@ -246,10 +164,6 @@ fn handle_connection(mut stream: TcpStream) {
         );
         let server_file_path = format!("html{}", path);
         let server_file_path = server_file_path.as_str();
-        // let post =  b"POST /brew HTTP/1.1\r\n";
-        // for IPFS
-        // https://docs.rs/pinata-sdk/latest/pinata_sdk/
-        // https://github.com/ferristseng/rust-ipfs-api
 
         let (mut status_line, mut filename_path) = 
             if buffer.starts_with(get_home) {
@@ -356,13 +270,7 @@ fn handle_connection(mut stream: TcpStream) {
             
             // Process the received JSON data
             let received_data = String::from_utf8(body).unwrap();
-            let response_data = process_received_data(received_data);
-            
-            let response = format!(
-                "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\n\r\n{}",
-                response_data.len(),
-                response_data
-            );
+            let response = process_received_data(received_data);
 
             stream.write(response.as_bytes()).unwrap();
             stream.flush().unwrap();
@@ -416,94 +324,276 @@ fn get_content_type(filename: &str) -> &str {
     }
 }
 
-fn process_received_data(data: String, hashtable: &HashTable<QuarkCollectionMetadataStandard>) -> String {
-    // Do processing on the received data and return the response
-    // ...
+fn process_received_data(data: String) -> String {
+
     // Getting the CombinationKey
-    // conmbination=balcktea+whitetea+pineapple+jasmine
+    // conmbination=balcktea_whitetea_pineapple_jasmine
      let key: Vec<&str> = data.split("=").collect();
      let combination = key[1].trim_end_matches('\0').to_string();
      
-    //  println!("key is: {:#?}", combination);
-    // get the hashtable location
+     println!("key is: {:#?}", combination);
 
-    let QuarkCollectionMetadataStandard = hashtable.search(&combination); 
-    // let ingredients = combination add the ingridents to the metadata
-    // Add the ingredients to the metadata
+     let combination_clone = combination.clone();
 
+    let mut hashtable = HashTable::new(365, "hashtable.bin");
+    let key = hashtable.insert(combination_clone);
+    println!("The Hashtable is: \n{:#?}", hashtable);
 
+    println!("The Key is: \n{}", key);
+    let response = if key < 365 {
 
+        let ingridients: Vec<String> = combination.split("_").map(|s| s.to_string()).collect();
+        let mut attributes = Vec::new();
+        for i in 0..ingridients.len() {
+            // TODO: Add soonami offers as attributes here
+            // 10% off Audit.One smart contract audit - 20 tokens
+            // 20% off FlyingFishTeaCo order - 200 token
+            // Whitelist for future token drops - 365 token
+            // Priority list for all future Soonami events - 100 token
 
-    // create the metadata 
-
-    // // Create an instance of the PinataApi struct
-    // let pinata_api = PinataApi::new(pinata_api_key, pinata_secret_api_key);
-
-    // // Open the file you want to upload
-    // let mut file = File::open("path/to/your/file").unwrap();
-
-    // // Read the contents of the file into a buffer
-    // let mut buffer = vec![];
-    // file.read_to_end(&mut buffer).unwrap();
-
-    // // Upload the contents of the buffer to Pinata
-    // let response = pinata_api.pin_file_to_ipfs(&buffer[..]).unwrap();
-
-    // // Print the IPFS hash of the file
-    // println!("The file was uploaded to IPFS and can be accessed at: https://ipfs.io/ipfs/{}", response.IpfsHash);
-
-    // put the metadata on ipfs
-    // HashMap derives serde::Serialize
-    // let mut json_data = HashMap::new();
-    // json_data.insert("name", "user");
-    
-    let result = pinata_api.pin_json(PinByJson::new(QuarkCollectionMetadataStandard)).await;
-    
-    if let Ok(pinned_object) = result {
-        let hash = pinned_object.ipfs_hash;
-        
-        let  ipfs_uri=format!(
-            "ipfs://{}", hash
-        )
-        
-        // sign the uri
-        let (_eloop, transport) = web3::transports::Http::new("http://localhost:8545").unwrap();
-        let web3 = Web3::new(transport);
-
-        // Define the address of your Ethereum account
-        // let account: Address = "0x1234567890123456789012345678901234567890".parse().unwrap();
-
-        // Sign the `ipfs_uri` string
-        let signature = web3.eth().sign(account, Some(ipfs_uri.into()));
-
-        match signature {
-            Ok(signature) => {
-
-                // return the uri
-
-                // Return the signed `ipfs_uri`
-                // let response = "{\"status\": \"success\"}".to_string();
-                let response = hash_map.new();
-                response.insert("ipfs_uri", ipfs_uri);
-                response.insert("signature", signature);
-                
-                println!("Signed IPFS URI: {}", ipfs_uri);
-                println!("Signature: {:?}", signature);
-                response // this is the last lone of our code for backend.
-            }
-            Err(error) => {
-                println!("Error signing IPFS URI: {}", error);
-            }
+            let attribute = Attribute {
+                trait_type: Some(String::from("ingredient")),
+                value: format!("{}", ingridients[i]),
+            };
+            attributes.push(attribute);
         }
+        let attributes_opensea = attributes.clone();
+        println!("The Attributes are: \n{:#?}", attributes);
+
+
+        // create the metadata
+        let name = format!("NFTea");
+        let image = format!("https://ipfs.io/ipfs/QmcQrUhV9wk24PUXC72gJL1JnSvshBRZZ4E2EJYJ8643V8/{}.png", key + 1); //is this correct?=> array[i] or i ?? <<<<==== Davood =>>>>>>>>
+        let description = format!("Our NFTeas are truly special blend utilising the power of mQuark , they are more than an image,  they are transformed into living, breathing pieces of art, each with its own unique flavour and personality. Infinitely upgradable through this metadata they offer true interoperability - take them anywhere!");
+        let origins = Origins {
+            template: Template {
+                id: format!("1"),
+                name: format!("mQuark Beverage"),
+                image: format!("https://ipfs.io/ipfs/QmTxpSbXqB5m7PsnEzofMnVTCoyUCJy1i224t2Kv9WZoa4"),
+                description: format!("This is a Beverage Template, a simple representation of beverage-typed NFT collections."),
+                attributes: Some(vec![
+                    AttributeValueOnly {
+                        value: format!("Type"),
+                    },
+                    AttributeValueOnly {
+                        value: format!("Temperature"),
+                    },
+                    AttributeValueOnly {
+                        value: format!("Ingredient Type"),
+                    },
+                    AttributeValueOnly {
+                        value: format!("Sweetness Level"),
+                    },
+                    AttributeValueOnly {
+                        value: format!("Size"),
+                    },
+                    AttributeValueOnly {
+                        value: format!("Milk Type"),
+                    },
+                    AttributeValueOnly {
+                        value: format!("Effect"),
+                    },
+                    AttributeValueOnly {
+                        value: format!("Container"),
+                    },
+                    AttributeValueOnly {
+                        value: format!("Rarity"),
+                    },
+                ]),
+            },
+            project: Project {
+                id: format!("1"),
+                name: format!("Flying Fish Tea Co."),
+                image: format!("https://cdn.shopify.com/s/files/1/0531/1116/0993/files/green_logo-2-2-2-2-2_140x.jpg?v=1636920599"),
+                description: Some(format!("https://www.flyingfishtea.co.uk/")),
+            },
+            collection: Collection {
+                id: format!("1"),
+                name: format!("NFTea"),
+                description: Some(format!("Once upon a time, in a land where teas were kings, six unique ones lived together in harmony. Black tea, White tea, Green tea, Rooibos tea, Pu-erh tea, and Oolong tea each had their own special qualities and lived in separate tea gardens, content with their daily routines. But one day, they heard whispers of a revolutionary new world, a place where they could become more than just tea - the world of Web3.\nExcited by the prospect of becoming something truly unique, the teas decided to embark on a journey together to discover this magical land. Along the way, they gathered special ingredients to enhance their flavors and make themselves stand out from the rest.\nFinally, they arrived at the entrance to the Web3 world - a sprawling marketplace filled with opportunities and challenges. As they explored this new and exciting place, they discovered that they could use blockchain technology to create unique digital representations of themselves, each with their own special blend of ingredients.\nThe teas worked tirelessly, perfecting their digital creations and blending themselves with the finest ingredients. And soon, they were transformed into living, breathing pieces of art, each with its own unique flavor and personality.\nAs they explored the Web3 world, they encountered other digital creations and formed friendships with them. They learned that they could trade their digital representations with others and that their creations would live forever, becoming a part of Web3's rich history.\nAnd so, the six teas lived happily ever after, continuing to explore the wonders of web3 and sharing their unique creations with the world. They knew that they would never forget their journey and the lessons they had learned along the way."
+                                )),
+                image: Some(format!("{}", "ipfs://[collection-cid]")),
+                variations: String::from("dynamic"),
+                attributes,
+            },
+        };
+
+        let raw_metadata = QuarkCollectionMetadataStandard {
+            name,
+            image,
+            description,
+            origins,
+            attributes: attributes_opensea,
+        };
+
+        let metadata = serde_json::to_string(&raw_metadata).expect("the metadata was not successfully created.");
         
-    }
+        // Load env variables
+        load_env();
+        // IPFS response
 
+        // Get the Pinata API key from the environment variables
+        let pinata_api_key = env::var("PINATA_API_KEY").expect("PINATA_API_KEY must be set in the .env file");
+        // Get the Pinata secret API key from the environment variables
+        let pinata_secret_api_key = env::var("PINATA_SECRET_API_KEY").expect("PINATA_SECRET_API_KEY must be set in the .env file");
 
-    
+        let pinata_api = PinataApi::new(pinata_api_key, pinata_secret_api_key).unwrap();
+        let result = pinata_api.pin_json(PinByJson::new(metadata)).await;
+        if let Ok(pinned_object) = result {
+            let hash = pinned_object.ipfs_hash;
+            let ipfs_uri = format!(
+                "ipfs://{}", hash // DOUBLE CHECK THIS METADATA URI RESPONSE
+            );
 
-    let response = "{\"status\": \"success\"}".to_string();
+            let private_key = env::var("PRIVATE_KEY").expect("PRIVATE_KEY must be set in the .env file");
+
+            let signature = sign_message(&private_key, &ipfs_uri).unwrap();
+            let signature_hex = hex::encode(signature);
+
+            let response_data = SignedURIResponse {
+                signature: signature_hex,
+                ipfs_uri,
+                metadata
+            }
+
+            let response_json = serde_json::to_string(&response_data).expect("the response_data was not successfully created.");
+
+            let signed_response = format!(
+                "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\n\r\n{}",
+                response_json.len(),
+                response_json
+            );
+
+            signed_response
+        } else  {
+            // signature failed. remove the item from hashtable.
+            // Choose different combination
+            let status_line = "HTTP/1.1 400 Bad Request";
+            let contents = "{\"error_message\": \"Signature failed.\"}".to_string();
+            let error_response = format!(
+                "{}\r\nContent-Length: {}\r\n\r\n{}",
+                status_line,
+                contents.len(),
+                contents
+            );
+            error_response
+        }
+    } else {
+        let status_line = "HTTP/1.1 403 Forbidden";
+        let contents = "{\"error_message\": \"Already submited. Try reordering your ingridient combination.\"}".to_string();
+        let error_response = format!(
+            "{}\r\nContent-Length: {}\r\n\r\n{}",
+            status_line,
+            contents.len(),
+            contents
+        );
+
+        // remove the key from hashtable.
+
+        error_response
+    };
+
+    println!("Response is: {:#?}", response);
     response
 }
+
+// fn sign_message(private_key: &str, message: &str) -> Result<Vec<u8>, SigningError> {
+//     let private_key_bytes = Vec::<u8>::from_hex(private_key).unwrap();
+//     let message_bytes = message.as_bytes();
+//     let wallet = LocalWallet::new(private_key_bytes);
+//     let signature = wallet.sign_message(message).await?;
+//     Ok(signature.as_bytes().to_vec())
+// }
+
+fn sign_message(private_key: &str, message: &str) -> Result<Vec<u8>, SigningError> {
+    let private_key_bytes = Vec::<u8>::from_hex(private_key).map_err(SigningError::FromHexError)?;
+    let message_bytes = message.as_bytes();
+    let wallet = LocalWallet::new(private_key_bytes);
+    let signature = wallet.sign_message(message_bytes).map_err(SigningError::SigningError)?;
+    Ok(signature.as_bytes().to_vec())
+}
+
+
+#[derive(Debug, Clone)]
+enum Value {
+    Str(String),
+    Num(f64),
+    Bool(bool),
+    Array(Vec<Value>),
+    Map(HashMap<String, Value>),
+}
+
+fn hashmap_to_json(map: &HashMap<String, Value>) -> String {
+    let mut json = String::new();
+    json.push_str("{");
+
+    let mut first = true;
+    for (key, value) in map.iter() {
+        if !first {
+            json.push_str(",");
+        }
+        first = false;
+
+        json.push_str(&format!("\"{}\":", key));
+        match value {
+            Value::Str(s) => {
+                json.push_str(&format!("\"{}\"", s));
+            }
+            Value::Num(n) => {
+                json.push_str(&format!("{}", n));
+            }
+            Value::Bool(b) => {
+                json.push_str(&format!("{}", b));
+            }
+            Value::Array(a) => {
+                json.push_str(&array_to_json(a));
+            }
+            Value::Map(m) => {
+                json.push_str(&hashmap_to_json(m));
+            }
+        }
+    }
+
+    json.push_str("}");
+    json
+}
+
+fn array_to_json(array: &Vec<Value>) -> String {
+    let mut json = String::new();
+    json.push_str("[");
+
+    let mut first = true;
+    for value in array.iter() {
+        if !first {
+            json.push_str(",");
+        }
+        first = false;
+
+        match value {
+            Value::Str(s) => {
+                json.push_str(&format!("\"{}\"", s));
+            }
+            Value::Num(n) => {
+                json.push_str(&format!("{}", n));
+            }
+            Value::Bool(b) => {
+                json.push_str(&format!("{}", b));
+            }
+            Value::Array(a) => {
+                json.push_str(&array_to_json(a));
+            }
+            Value::Map(m) => {
+                json.push_str(&hashmap_to_json(m));
+            }
+        }
+    }
+
+    json.push_str("]");
+    json
+}
+
+
+
 
 
 

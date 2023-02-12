@@ -12,30 +12,33 @@ use server::{ThreadPool, HashTable};
 use url::Url;
 use std::collections::HashMap;
 use pinata_sdk::{ApiError, PinataApi, PinByJson};
+use hex::FromHex;
 // use ethereum_types::{Address, H256, U256};
 // use ethereum_rust::keccak256;
 // use ethereum_rust::signer::{self, SigningError};
-use hex::{encode};
-use ethers_signers::{LocalWallet, Signer};
+use hex::{encode, decode};
 use std::convert::TryFrom;
+use ethers_signers::{Signer, LocalWallet};
 
-#[derive(Debug)]
-enum SigningError {
-    FromHexError(hex::FromHexError),
-    SigningError(ethers_signers::error::Error),
-}
+// use futures_util::future::try_future::TryFutureExt;
 
-impl From<hex::FromHexError> for SigningError {
-    fn from(error: hex::FromHexError) -> Self {
-        SigningError::FromHexError(error)
-    }
-}
+// #[derive(Debug)]
+// enum SigningError {
+//     FromHexError(hex::FromHexError),
+//     SigningError(ethers_signers::error::Error),
+// }
 
-impl From<ethers_signers::error::Error> for SigningError {
-    fn from(error: ethers_signers::error::Error) -> Self {
-        SigningError::SigningError(error)
-    }
-}
+// impl From<hex::FromHexError> for SigningError {
+//     fn from(error: hex::FromHexError) -> Self {
+//         SigningError::FromHexError(error)
+//     }
+// }
+
+// impl From<ethers_signers::error::Error> for SigningError {
+//     fn from(error: ethers_signers::error::Error) -> Self {
+//         SigningError::SigningError(error)
+//     }
+// }
 
 
 const DEBUGGER: bool = false;
@@ -121,7 +124,8 @@ fn load_env() {
     dotenv().ok();
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
 
     let num_threads: usize = num_cpus::get();
     let listener = 
@@ -139,7 +143,7 @@ fn main() {
     }
 }
 
-fn handle_connection(mut stream: TcpStream) {
+async fn handle_connection(mut stream: TcpStream) {
 
     let mut buffer = [0; 1024]; // 1024 bytes long buffer
     stream.read(&mut buffer).unwrap(); // unwrap for panic simplicity incase, switch to error handling for production
@@ -272,7 +276,7 @@ fn handle_connection(mut stream: TcpStream) {
             let received_data = String::from_utf8(body).unwrap();
             let response = process_received_data(received_data);
 
-            stream.write(response.as_bytes()).unwrap();
+            stream.write(response.await.as_bytes()).unwrap();
             stream.flush().unwrap();
 
             return;
@@ -324,7 +328,7 @@ fn get_content_type(filename: &str) -> &str {
     }
 }
 
-fn process_received_data(data: String) -> String {
+async fn process_received_data(data: String) -> String {
 
     // Getting the CombinationKey
     // conmbination=balcktea_whitetea_pineapple_jasmine
@@ -447,14 +451,14 @@ fn process_received_data(data: String) -> String {
 
             let private_key = env::var("PRIVATE_KEY").expect("PRIVATE_KEY must be set in the .env file");
 
-            let signature = sign_message(&private_key, &ipfs_uri).unwrap();
+            let signature = sign_message(&private_key, &ipfs_uri).await?;
             let signature_hex = hex::encode(signature);
 
             let response_data = SignedURIResponse {
                 signature: signature_hex,
                 ipfs_uri,
                 metadata
-            }
+            };
 
             let response_json = serde_json::to_string(&response_data).expect("the response_data was not successfully created.");
 
@@ -505,12 +509,12 @@ fn process_received_data(data: String) -> String {
 //     Ok(signature.as_bytes().to_vec())
 // }
 
-fn sign_message(private_key: &str, message: &str) -> Result<Vec<u8>, SigningError> {
-    let private_key_bytes = Vec::<u8>::from_hex(private_key).map_err(SigningError::FromHexError)?;
+async fn sign_message(hex_private_key: &str, message: &str) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+    let private_key_bytes = decode(hex_private_key).unwrap();
     let message_bytes = message.as_bytes();
-    let wallet = LocalWallet::new(private_key_bytes);
-    let signature = wallet.sign_message(message_bytes).map_err(SigningError::SigningError)?;
-    Ok(signature.as_bytes().to_vec())
+    let wallet = LocalWallet::new(&mut private_key_bytes);
+    let signature = wallet.sign_message(message_bytes).await?;
+    Ok(signature.into())
 }
 
 

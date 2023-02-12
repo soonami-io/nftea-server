@@ -2442,6 +2442,7 @@ dependencies = [
  "bincode",
  "dotenv",
  "ethers",
+ "ethers-core",
  "ethers-signers",
  "hex",
  "num_cpus",

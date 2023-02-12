@@ -19,6 +19,7 @@ use hex::FromHex;
 use hex::{encode, decode};
 use std::convert::TryFrom;
 use ethers_signers::{Signer, LocalWallet};
+use ethers_core::{k256::ecdsa::SigningKey};
 
 // use futures_util::future::try_future::TryFutureExt;
 
@@ -124,8 +125,8 @@ fn load_env() {
     dotenv().ok();
 }
 
-#[tokio::main]
-async fn main() {
+// #[tokio::main]
+fn main() {
 
     let num_threads: usize = num_cpus::get();
     let listener = 
@@ -136,7 +137,7 @@ async fn main() {
 
     for stream in listener.incoming() {
         let stream = stream.unwrap();
-
+        println!("hello from server listener");
         pool.execute( || {
             handle_connection(stream);
         });   
@@ -144,7 +145,7 @@ async fn main() {
 }
 
 async fn handle_connection(mut stream: TcpStream) {
-
+    println!("hello from the handle_connection");
     let mut buffer = [0; 1024]; // 1024 bytes long buffer
     stream.read(&mut buffer).unwrap(); // unwrap for panic simplicity incase, switch to error handling for production
     let (crud_type, path, queries) = extract_path_and_crud(&buffer);
@@ -274,9 +275,9 @@ async fn handle_connection(mut stream: TcpStream) {
             
             // Process the received JSON data
             let received_data = String::from_utf8(body).unwrap();
-            let response = process_received_data(received_data);
+            let response = process_received_data(received_data).await;
 
-            stream.write(response.await.as_bytes()).unwrap();
+            stream.write(response.as_bytes()).unwrap();
             stream.flush().unwrap();
 
             return;
@@ -366,7 +367,7 @@ async fn process_received_data(data: String) -> String {
 
 
         // create the metadata
-        let name = format!("NFTea");
+        let name = format!("NFTea TESTNET");
         let image = format!("https://ipfs.io/ipfs/QmcQrUhV9wk24PUXC72gJL1JnSvshBRZZ4E2EJYJ8643V8/{}.png", key + 1); //is this correct?=> array[i] or i ?? <<<<==== Davood =>>>>>>>>
         let description = format!("Our NFTeas are truly special blend utilising the power of mQuark , they are more than an image,  they are transformed into living, breathing pieces of art, each with its own unique flavour and personality. Infinitely upgradable through this metadata they offer true interoperability - take them anywhere!");
         let origins = Origins {
@@ -431,18 +432,20 @@ async fn process_received_data(data: String) -> String {
         };
 
         let metadata = serde_json::to_string(&raw_metadata).expect("the metadata was not successfully created.");
-        
+        let metadata_to_ipfs = metadata.clone();
         // Load env variables
         load_env();
         // IPFS response
-
+        println!("Hello from loaded ENV variables here!");
         // Get the Pinata API key from the environment variables
         let pinata_api_key = env::var("PINATA_API_KEY").expect("PINATA_API_KEY must be set in the .env file");
         // Get the Pinata secret API key from the environment variables
         let pinata_secret_api_key = env::var("PINATA_SECRET_API_KEY").expect("PINATA_SECRET_API_KEY must be set in the .env file");
-
+        println!("After setting Pinata ENV variables here!");
         let pinata_api = PinataApi::new(pinata_api_key, pinata_secret_api_key).unwrap();
-        let result = pinata_api.pin_json(PinByJson::new(metadata)).await;
+        println!("Hello from After setting pinata_api!");
+        let result = pinata_api.pin_json(PinByJson::new(metadata_to_ipfs)).await;
+        println!("Hello from After getting pinata_api response!");
         if let Ok(pinned_object) = result {
             let hash = pinned_object.ipfs_hash;
             let ipfs_uri = format!(
@@ -451,7 +454,7 @@ async fn process_received_data(data: String) -> String {
 
             let private_key = env::var("PRIVATE_KEY").expect("PRIVATE_KEY must be set in the .env file");
 
-            let signature = sign_message(&private_key, &ipfs_uri).await?;
+            let signature = sign_message(&private_key, &ipfs_uri).await.unwrap();
             let signature_hex = hex::encode(signature);
 
             let response_data = SignedURIResponse {
@@ -510,11 +513,17 @@ async fn process_received_data(data: String) -> String {
 // }
 
 async fn sign_message(hex_private_key: &str, message: &str) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
-    let private_key_bytes = decode(hex_private_key).unwrap();
-    let message_bytes = message.as_bytes();
-    let wallet = LocalWallet::new(&mut private_key_bytes);
-    let signature = wallet.sign_message(message_bytes).await?;
-    Ok(signature.into())
+    // https://docs.rs/ethsign/latest/ethsign/
+    // let private_key_bytes = decode(hex_private_key.trim_start_matches("0x")).unwrap();
+    // let message_bytes = message.as_bytes();
+    // let wallet = LocalWallet::new(&mut private_key_bytes);
+    // instantiate the wallet
+    let wallet = hex_private_key.trim_start_matches("0x").parse::<LocalWallet>().expect("wallet wasnt created");
+    let signature = wallet.sign_message(message).await.expect("signing the message failed!");
+    // signature.as_bytes().to_vec()
+    println!("Hello from here!");
+    let signature_hex = format!("0x{}", signature);
+    hex::decode(signature_hex.trim_start_matches("0x")).map_err(|e| e.into())
 }
 
 

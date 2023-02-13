@@ -64,19 +64,13 @@ pub async fn create_uri(
     request: Json<SubmitIngridients>
 ) -> Result<Json<SignedURIResponse>, TaskError> {
     let combination = request.combination.clone();
-    // println!("ingridents are: {}", combination);
 
      let mut hashtable: HashTable<String> = HashTable::new(365, "hashtable.bin");
-     
      let key = hashtable.insert(combination.clone());
-     
-    //  println!("The Key is: \n{}", key);
-     
 
     let response = if key < 365 {
         let dynamic_attributes: HashTable<Attribute> = HashTable::new(365, "attributes.bin");
-        // println!("The attribues are: \n{:#?}", dynamic_attributes.data);
-        // println!("The attribue At key is: \n{:#?}", dynamic_attributes.data[key]);
+
         let ingridients: Vec<String> = combination.split("_").map(|s| s.to_string()).collect();
         let mut attributes = Vec::new();
         for i in 0..ingridients.len() {
@@ -98,10 +92,9 @@ pub async fn create_uri(
         }
         
         let attributes_opensea = attributes.clone();
-        // println!("The Attributes are: \n{:#?}", attributes);
 
         // create the metadata
-        let name = format!("NFTea TESTNET");
+        let name = format!("NFTea");
         let image = format!("https://ipfs.io/ipfs/QmcQrUhV9wk24PUXC72gJL1JnSvshBRZZ4E2EJYJ8643V8/{}.png", key + 1); //is this correct?=> array[i] or i ?? <<<<==== Davood =>>>>>>>>
         let description = format!("Our NFTeas are truly special blend utilising the power of mQuark , they are more than an image,  they are transformed into living, breathing pieces of art, each with its own unique flavour and personality. Infinitely upgradable through this metadata they offer true interoperability - take them anywhere!");
         let origins = Origins {
@@ -143,15 +136,14 @@ pub async fn create_uri(
             project: Project {
                 id: format!("1"),
                 name: format!("Flying Fish Tea Co."),
-                image: format!("https://cdn.shopify.com/s/files/1/0531/1116/0993/files/green_logo-2-2-2-2-2_140x.jpg?v=1636920599"),
-                description: Some(format!("https://www.flyingfishtea.co.uk/")),
+                image: format!("ipfs://Qmc3HpEBVU1Stj47Pwui2grhS6G9UvBumNr6Z23KosL6z9"),
+                description: Some(format!("https://www.flyingfishtea.co.uk/pages/about-us")),
             },
             collection: Collection {
                 id: format!("1"),
                 name: format!("NFTea"),
-                description: Some(format!("Once upon a time, in a land where teas were kings, six unique ones lived together in harmony. Black tea, White tea, Green tea, Rooibos tea, Pu-erh tea, and Oolong tea each had their own special qualities and lived in separate tea gardens, content with their daily routines. But one day, they heard whispers of a revolutionary new world, a place where they could become more than just tea - the world of Web3.\nExcited by the prospect of becoming something truly unique, the teas decided to embark on a journey together to discover this magical land. Along the way, they gathered special ingredients to enhance their flavors and make themselves stand out from the rest.\nFinally, they arrived at the entrance to the Web3 world - a sprawling marketplace filled with opportunities and challenges. As they explored this new and exciting place, they discovered that they could use blockchain technology to create unique digital representations of themselves, each with their own special blend of ingredients.\nThe teas worked tirelessly, perfecting their digital creations and blending themselves with the finest ingredients. And soon, they were transformed into living, breathing pieces of art, each with its own unique flavor and personality.\nAs they explored the Web3 world, they encountered other digital creations and formed friendships with them. They learned that they could trade their digital representations with others and that their creations would live forever, becoming a part of Web3's rich history.\nAnd so, the six teas lived happily ever after, continuing to explore the wonders of web3 and sharing their unique creations with the world. They knew that they would never forget their journey and the lessons they had learned along the way."
-                                )),
-                image: Some(format!("{}", "ipfs://QmRNP2Djjc4VPviY3T6A56pKbq9ssjzXKEu52hc9YBxmNX")),
+                description: Some(format!("Once upon a time, in a land where teas were kings, six unique ones lived together in harmony. Black tea, White tea, Green tea, Rooibos tea, Pu-erh tea, and Oolong tea each had their own special qualities and lived in separate tea gardens, content with their daily routines. But one day, they heard whispers of a revolutionary new world, a place where they could become more than just tea - the world of Web3.\nExcited by the prospect of becoming something truly unique, the teas decided to embark on a journey together to discover this magical land. Along the way, they gathered special ingredients to enhance their flavors and make themselves stand out from the rest.\nFinally, they arrived at the entrance to the Web3 world - a sprawling marketplace filled with opportunities and challenges. As they explored this new and exciting place, they discovered that they could use blockchain technology to create unique digital representations of themselves, each with their own special blend of ingredients.\nThe teas worked tirelessly, perfecting their digital creations and blending themselves with the finest ingredients. And soon, they were transformed into living, breathing pieces of art, each with its own unique flavor and personality.\nAs they explored the Web3 world, they encountered other digital creations and formed friendships with them. They learned that they could trade their digital representations with others and that their creations would live forever, becoming a part of Web3's rich history.\nAnd so, the six teas lived happily ever after, continuing to explore the wonders of web3 and sharing their unique creations with the world. They knew that they would never forget their journey and the lessons they had learned along the way.")),
+                image: Some(format!("ipfs://QmRNP2Djjc4VPviY3T6A56pKbq9ssjzXKEu52hc9YBxmNX")),
                 variations: String::from("dynamic"),
                 attributes,
             },
@@ -184,7 +176,6 @@ pub async fn create_uri(
             let ipfs_uri = format!(
                 "ipfs://{}", hash 
             );
-            // println!("The ipfs_uri is: \n{:#?}", ipfs_uri);
 
             let private_key = env::var("PRIVATE_KEY").expect("PRIVATE_KEY must be set in the .env file");
             let signature = match sign_message(&private_key, &ipfs_uri).await {
@@ -201,7 +192,6 @@ pub async fn create_uri(
                 metadata: raw_metadata
             };
 
-            // println!("The signature is: \n{:#?}", response_data);
             Ok::<Json<SignedURIResponse>, TaskError>(Json(response_data))
 
         } else {
@@ -220,8 +210,8 @@ async fn sign_message(hex_private_key: &str, uri: &str) -> Result<Vec<u8>, Box<d
     let wallet = hex_private_key.trim_start_matches("0x").parse::<LocalWallet>().expect("wallet wasnt created");
     // println!("wallet address is: {}", wallet.address());
 
-    let verifier = "0x15b9576fF4a224eD08f2E04c77B169a07B9d9D3B".parse::<Address>().expect("failed to parse verifier address");
-    let project_id = U256::from(3u64);
+    let verifier = "0x49dbfb94314CF76b2Fe990e9dc5E59AF7b68E4b1".parse::<Address>().expect("failed to parse verifier address");
+    let project_id = U256::from(1u64);
     let template_id = U256::from(1u64);
     let collection_id = U256::from(1u64);
 

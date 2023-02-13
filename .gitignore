@@ -2,3 +2,15 @@
 .env
 hashtable.bin
 attributes.bin
+
+#Infrastructure
+Infrastructure
+config/*config.env
+**/.terraform/**
+**/*tfplan
+**/*key.json
+**/Dockerrun.aws
+**/*.tfstate
+**/*.tfstate.backup
+**/*.terraform.lock.hcl
+Makefile

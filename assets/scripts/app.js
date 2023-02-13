@@ -227,15 +227,17 @@ const app_component = {
       wallet_address: null,
       web3_connected: false,
       //!change addresses
-      payment_contract_address: "0x874908964FA2fF017947B880E2C9fef95bb98F66",
-      mquark_contract_address: "0x50Fbd77919F74777967fEFB45a7Edad0aD5025C1",
+      // payment_contract_address: "0x874908964FA2fF017947B880E2C9fef95bb98F66",
+      payment_contract_address: "0xDEE416e75A8443dE13DbbBf0C3b558F7fC45eC2c",
+      // mquark_contract_address: "0x50Fbd77919F74777967fEFB45a7Edad0aD5025C1",
+      mquark_contract_address: "0x30aB861483079Cbb58B0DC95804B861DD5Aa631F",
       payment_abi: abi,
       _mquark_abi: mquark_abi,
       contribution: 0,
       show_popup: false,
       brewed_tea: null,
       //!change below
-      backend_response: { signer: "", signature: "", uri: "", salt: "0x01", projectId: "3", templateId: "1", collectionId: "1" },
+      backend_response: { signer: "0x49dbfb94314CF76b2Fe990e9dc5E59AF7b68E4b1", signature: "", uri: "", salt: "0x01", projectId: "1", templateId: "1", collectionId: "1",isLoading:false },
       transactionLoading: false,
       transactionSuccess: false,
       mintedNftCount: 0,
@@ -359,12 +361,13 @@ const app_component = {
       const data = {
         combination: _combination
       };
-
+      this.backend_response.isLoading= true;
       // (await axios.post('/uri', data))
       // .then(response => {
+        //!change backendResponse
         let _respone = (backendResponse);
+                                                            //!change backendResponse
         window.localStorage.setItem("brewed_tea",JSON.stringify(backendResponse))
-
         // window.localStorage.setItem("brewed_tea",_respone)
         this.backend_response.signature = `0x${_respone.signature}`
         let cid = _respone.metadata.image.split("/");
@@ -378,6 +381,8 @@ const app_component = {
       // .catch(error => {
       //   console.error(error);
       // });
+      this.backend_response.isLoading= false;
+
       //call backend get the response
       // // -this.backend_response.signer = "0xC52d3ECB7F84A27c68541933FDd5b74b96334c05";
       // this.backend_response.signer = "0x15b9576fF4a224eD08f2E04c77B169a07B9d9D3B";
@@ -397,6 +402,8 @@ const app_component = {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
       const payment_contract = new ethers.Contract(this.payment_contract_address, this.payment_abi, signer);
+      const mintStatus = payment_contract.mintedAddresses(signer)
+      if(mintStatus) window.alert("You have already minted NFTea!");
       try {
         if (this.contribution < 0) {
           window.alert("The contribution can't be a minus value, or you can mint for free on the left button.");
@@ -425,6 +432,8 @@ const app_component = {
     mint_free: async function () {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
+      const mintStatus = payment_contract.mintedAddresses(signer)
+      if(mintStatus) window.alert("You have already minted NFTea!");
       const payment_contract = new ethers.Contract(this.payment_contract_address, this.payment_abi, signer);
       try {
         let tx = await payment_contract.voluntaryContributionMint(
@@ -491,18 +500,21 @@ const app_component = {
     },
   },
   mounted: async function () {
+    if(window.localStorage.getItem("brewed_tea")) this.backend_response.isLoading = true;
     //! update here as well
-    const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.g.alchemy.com/v2/6C2ub0-l9nAs7qb_17wH8OVfs0ECYfGC");
+    const provider = new ethers.providers.JsonRpcProvider("https://polygon-mainnet.g.alchemy.com/v2/N9HCtvuidF3dTQuRuQ3ORN304LADukdp");
     const mquark_contract = new ethers.Contract(this.mquark_contract_address, this._mquark_abi, provider);
     const payment_contract = new ethers.Contract(this.payment_contract_address, this.payment_abi, provider);
 
+    // window.localStorage.clear();
     //! update here after deploying to mainnet
-    let result = await mquark_contract.getProjectCollection("3", "1", "1");
+    let result = await mquark_contract.getProjectCollection("1", "1", "1");
     this.mintedNftCount = result.mintCount.toString();
 
     let _totalContributedAmount = await payment_contract.getTotalContribution();
     this.totalContributedAmount = ethers.utils.formatEther(_totalContributedAmount);
     if(window.localStorage.getItem("brewed_tea")){
+
       let _response = JSON.parse(window.localStorage.getItem("brewed_tea"));
       this.backend_response.signature = `0x${_response.signature}`
       let cid = _response.metadata.image.split("/");
@@ -511,6 +523,7 @@ const app_component = {
       this.backend_response.salt = "0x01";
       this.backend_response.uri = _response.ipfs_uri;
     } 
+    this.backend_response.isLoading = false;
   },
 };
 

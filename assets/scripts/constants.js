@@ -1,12 +1,6 @@
 const abi = [
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_contributionValidAddress",
-        "type": "address"
-      }
-    ],
+    "inputs": [],
     "stateMutability": "nonpayable",
     "type": "constructor"
   },
@@ -917,6 +911,25 @@ const mquark_abi = [
     "inputs": [
       {
         "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "name": "balanceOf",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "royaltyReciever",
         "type": "address"
       },
@@ -1761,7 +1774,7 @@ const mquark_abi = [
         "type": "bool"
       }
     ],
-    "stateMutability": "view",
+    "stateMutability": "pure",
     "type": "function"
   },
   {

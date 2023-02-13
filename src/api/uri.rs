@@ -1,118 +1,33 @@
-// use crate::model::metadata::{
-//     DisplayType,
-//     AttributeValueOnly,
-
-// }
-use std::hash::{Hash, Hasher};
+use crate::model::metadata::{
+    SignedURIResponse,
+    QuarkCollectionMetadataStandard,
+    Origins,
+    Template,
+    Project,
+    Collection,
+    Attribute,
+    AttributeValueOnly,
+};
 use crate::repository::hashtable::HashTable;
 use dotenv::dotenv;
 use std::env;
-use pinata_sdk::{ApiError, PinataApi, PinByJson};
-use hex::FromHex;
+use pinata_sdk::{PinataApi, PinByJson};
 use hex;
-use std::convert::TryFrom;
 use ethers_signers::{Signer, LocalWallet};
-use ethers_core::{k256::ecdsa::SigningKey};
 use ethers::utils;
 use ethers_core::abi::encode;
 use ethers_core::types::{Address, U256};
-
+use serde::{Deserialize};
+use derive_more::{Display};
 use actix_web::{
-    get, 
     post, 
-    put,
     error::ResponseError,
-    web::Path,
     web::Json,
-    web::Data,
     HttpResponse,
     http::{header::ContentType, StatusCode}
 };
-use serde::{Serialize, Deserialize};
-use derive_more::{Display};
-use std::collections::HashMap;
 
-#[derive(Serialize, Deserialize, Debug)]
-struct SignedURIResponse {
-  signature: String,
-  ipfs_uri: String,
-  metadata: QuarkCollectionMetadataStandard,
-}
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-struct QuarkCollectionMetadataStandard {
-  name: String,
-  image: String,
-  description: String,
-  origins: Origins,
-  attributes: Vec<Attribute>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-struct Origins {
-  template: Template,
-  project: Project,
-  collection: Collection,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-struct Template {
-  id: String,
-  name: String,
-  image: String,
-  description: String,
-  attributes: Option<Vec<AttributeValueOnly>>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-struct Project {
-  id: String,
-  name: String,
-  image: String,
-  description: Option<String>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-struct Collection {
-  id: String,
-  name: String,
-  description: Option<String>,
-  image: Option<String>,
-  variations: String,
-  attributes: Vec<Attribute>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-enum Variations {
-  Dynamic,
-  Static(u32),
-}
-
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-struct Attribute {
-  trait_type: Option<String>, // ingrident
-  value: String, // e.g. blacktea
-}
-
-impl Hash for Attribute {
-  fn hash<H: Hasher>(&self, state: &mut H) {
-      self.trait_type.hash(state);
-      self.value.hash(state);
-  }
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-struct AttributeValueOnly {
-      value: String, // e.g. blacktea
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-enum DisplayType {
-  BoostPercentage,
-  BoostNumber,
-  Number,
-  Date,
-}
 
 #[derive(Deserialize, Debug)]
 pub struct SubmitIngridients {
@@ -122,11 +37,8 @@ pub struct SubmitIngridients {
 #[derive(Debug, Display)]
 pub enum TaskError {
     SignatureFailed,
-    WalletFailed,
     MetadataFailed,
     NftTaken,
-    Forbidden,
-    Conflict
 }
 
 impl ResponseError for TaskError {
@@ -139,14 +51,13 @@ impl ResponseError for TaskError {
     fn status_code(&self) -> StatusCode {
         match self {
             TaskError::SignatureFailed => StatusCode::FAILED_DEPENDENCY,
-            TaskError::WalletFailed => StatusCode::FAILED_DEPENDENCY,
             TaskError::MetadataFailed => StatusCode::FAILED_DEPENDENCY,
             TaskError::NftTaken => StatusCode::METHOD_NOT_ALLOWED,
-            TaskError::Forbidden => StatusCode::FORBIDDEN,
-            TaskError::Conflict => StatusCode::CONFLICT,
         }
     }
 }
+
+
 
 #[post("/uri")]
 pub async fn create_uri(
@@ -262,7 +173,7 @@ pub async fn create_uri(
         // IPFS response
         let pinata_api = match PinataApi::new(pinata_api_key, pinata_secret_api_key) {
             Ok(api) => api,
-            Err(e) => {
+            Err(_) => {
                 return Err(TaskError::MetadataFailed);
             }
         };

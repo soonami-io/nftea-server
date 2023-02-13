@@ -7,7 +7,7 @@ use repository::attributes::populate_attributes;
 use model::metadata::Attribute;
 use crate::repository::hashtable::HashTable;
 
-use actix_web::{HttpServer, App, web::Data, middleware::Logger};
+use actix_web::{HttpServer, App, middleware::Logger};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {

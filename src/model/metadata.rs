@@ -1,68 +1,66 @@
 use serde::{Serialize, Deserialize};
-use strum_macros::{EnumString, Display};
-use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SignedURIResponse {
-  signature: String,
-  ipfs_uri: String,
-  metadata: QuarkCollectionMetadataStandard,
+  pub signature: String,
+  pub ipfs_uri: String,
+  pub metadata: QuarkCollectionMetadataStandard,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct QuarkCollectionMetadataStandard {
-  name: String,
-  image: String,
-  description: String,
-  origins: Origins,
-  attributes: Vec<Attribute>,
+  pub name: String,
+  pub image: String,
+  pub description: String,
+  pub origins: Origins,
+  pub attributes: Vec<Attribute>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Origins {
-  template: Template,
-  project: Project,
-  collection: Collection,
+  pub template: Template,
+  pub project: Project,
+  pub collection: Collection,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Template {
-  id: String,
-  name: String,
-  image: String,
-  description: String,
-  attributes: Option<Vec<AttributeValueOnly>>,
+  pub id: String,
+  pub name: String,
+  pub image: String,
+  pub description: String,
+  pub attributes: Option<Vec<AttributeValueOnly>>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Project {
-  id: String,
-  name: String,
-  image: String,
-  description: Option<String>,
+  pub id: String,
+  pub name: String,
+  pub image: String,
+  pub description: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Collection {
-  id: String,
-  name: String,
-  description: Option<String>,
-  image: Option<String>,
-  variations: String,
-  attributes: Vec<Attribute>,
+  pub id: String,
+  pub name: String,
+  pub description: Option<String>,
+  pub image: Option<String>,
+  pub variations: String,
+  pub attributes: Vec<Attribute>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-enum Variations {
+pub enum Variations {
   Dynamic,
   Static(u32),
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Attribute {
-  pub trait_type: Option<String>, // ingrident
-  pub value: String, // e.g. blacktea
+  pub trait_type: Option<String>, 
+  pub value: String, 
 }
 
 impl Hash for Attribute {
@@ -74,11 +72,11 @@ impl Hash for Attribute {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AttributeValueOnly {
-      value: String, // e.g. blacktea
+  pub value: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-enum DisplayType {
+pub enum DisplayType {
   BoostPercentage,
   BoostNumber,
   Number,

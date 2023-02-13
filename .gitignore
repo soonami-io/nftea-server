@@ -1,3 +1,4 @@
-target
-hashtable.bin
+/target
 .env
+hashtable.bin
+attributes.bin

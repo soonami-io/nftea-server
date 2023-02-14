@@ -362,12 +362,15 @@ const app_component = {
         combination: _combination
       };
       this.backend_response.isLoading= true;
-      // (await axios.post('/uri', data))
-      // .then(response => {
+      (await axios.post('http://3.70.32.6/uri', data,{
+
+      }))
+      .then(response => {
         //!change backendResponse
-        let _respone = (backendResponse);
+        console.log(response," <=")
+        let _respone = (response);
                                                             //!change backendResponse
-        window.localStorage.setItem("brewed_tea",JSON.stringify(backendResponse))
+        window.localStorage.setItem("brewed_tea",JSON.stringify(response))
         // window.localStorage.setItem("brewed_tea",_respone)
         this.backend_response.signature = `0x${_respone.signature}`
         let cid = _respone.metadata.image.split("/");
@@ -376,11 +379,13 @@ const app_component = {
         this.brewed_tea = `https://teal-worthwhile-mandrill-830.mypinata.cloud/ipfs/${cid}`
         this.backend_response.salt = "0x01";
         this.backend_response.uri = _respone.ipfs_uri;
-        // console.log(response.data);
-      // })
-      // .catch(error => {
-      //   console.error(error);
-      // });
+        console.log(response.data);
+        this.backend_response.isLoading= false;
+      })
+      .catch(error => {
+        console.error("error",error);
+        this.backend_response.isLoading= false;
+      });
       this.backend_response.isLoading= false;
 
       //call backend get the response

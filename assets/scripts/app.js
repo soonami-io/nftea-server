@@ -361,12 +361,7 @@ const app_component = {
       };
       this.backend_response.isLoading= true;
       try {
-        const response = await axios.post('https://3.70.32.6/uri', data,{
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            "Access-Control-Allow-Origin": "*"
-          }
-        });
+        const response = await axios.post('https://3.70.32.6/uri', data);
         let _respone = response.data;
 
         window.localStorage.setItem("brewed_tea",JSON.stringify(_respone))

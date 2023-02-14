@@ -48,7 +48,8 @@ async fn main() -> std::io::Result<()> {
         ])
         .allowed_header(http::header::CONTENT_TYPE)
         .max_age(3600)
-        .supports_credentials())
+        .supports_credentials()
+        .send_wildcard())
         .service(create_uri)
     })
     .bind(("127.0.0.1", 8080))?

@@ -6,8 +6,8 @@ use api::uri::create_uri;
 use repository::attributes::populate_attributes;
 use model::metadata::Attribute;
 use crate::repository::hashtable::HashTable;
-
-use actix_web::{http, HttpServer, App, middleware::{DefaultHeaders, Logger}};
+use actix_web::HttpResponse;
+use actix_web::{web, http, HttpServer, App, middleware::{DefaultHeaders, Logger}};
 use actix_cors::Cors;
 
 #[actix_web::main]
@@ -48,8 +48,8 @@ async fn main() -> std::io::Result<()> {
         ])
         .allowed_header(http::header::CONTENT_TYPE)
         .max_age(3600)
-        .supports_credentials()
-        .send_wildcard())
+        .supports_credentials())
+        .route("/health_check", web::get().to(|| HttpResponse::Ok()))
         .service(create_uri)
     })
     .bind(("127.0.0.1", 8080))?

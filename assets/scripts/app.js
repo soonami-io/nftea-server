@@ -363,7 +363,9 @@ const app_component = {
       try {
         const response = await axios.post('https://3.70.32.6/uri', data,
         {
-          'Access-Control-Allow-Origin': 'https://3.70.32.6/uri'
+          headers:{
+            'Access-Control-Allow-Origin': 'https://3.70.32.6/uri'
+          }
         });
         let _respone = response.data;
 

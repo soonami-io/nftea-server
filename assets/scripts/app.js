@@ -361,7 +361,8 @@ const app_component = {
       };
       this.backend_response.isLoading= true;
       try {
-        const response = await axios.post('https://3.70.32.6/uri', data);
+        // const response = await axios.post('https://3.70.32.6/uri', data);
+        const response = await axios.post('https://127.0.01/uri', data);
         let _respone = response.data;
 
         window.localStorage.setItem("brewed_tea",JSON.stringify(_respone))
@@ -418,7 +419,6 @@ const app_component = {
         this.set_transaction_loading();
         await tx.wait();
         this.set_transaction_success();
-        this.mounted();
       } catch (error) {
         if (error.message == "MetaMask Tx Signature: User denied transaction signature.")  console.log(error.message);
         else window.alert("An error happened. You may have forgotten to input a MATIC value. Or please check if your balance has sufficient fund for the contribution. Else you may have already minted one NFTea!");
@@ -452,7 +452,6 @@ const app_component = {
         this.set_transaction_loading();
         await tx.wait();
         this.set_transaction_success();
-        this.mounted();
       } catch (error) {
         if (error.message == "MetaMask Tx Signature: User denied transaction signature.")  console.log(error.message);
         else window.alert("An error happened. Please check your balance is enough for the contribution or you may have already minted one!");

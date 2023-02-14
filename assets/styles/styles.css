@@ -435,6 +435,8 @@ div#preview {
   top: 0;
 }
 
+
+
 div#preview > #image-box {
   margin-top: 0.9rem;
   align-self: flex-start;
@@ -628,4 +630,10 @@ footer a::before {
   h3 {
     page-break-after: avoid;
   }
+
+
+}
+
+.contributionCounter{
+  pointer-events: none;
 }

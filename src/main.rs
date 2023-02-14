@@ -40,7 +40,7 @@ async fn main() -> std::io::Result<()> {
         .wrap(DefaultHeaders::new().add(("Access-Control-Allow-Origin", "*")))
         .wrap(Cors::default()
         .allow_any_origin()
-        .allowed_methods(vec!["POST"])
+        .allowed_methods(vec!["POST", "OPTIONS"])
         .allowed_headers(vec![
             http::header::AUTHORIZATION,
             http::header::ACCEPT,

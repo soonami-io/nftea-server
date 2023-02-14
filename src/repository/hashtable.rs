@@ -70,21 +70,21 @@ impl<T: Hash + std::clone::Clone + std::cmp::PartialEq + Serialize + for<'a> Des
         false
     }
 
-    // pub fn delete(&mut self, item: &T) {
-    //     let mut hasher = std::collections::hash_map::DefaultHasher::new();
-    //     item.hash(&mut hasher);
-    //     let mut position = hasher.finish() as usize % self.capacity;
+    pub fn delete(&mut self, item: &T) {
+        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+        item.hash(&mut hasher);
+        let mut position = hasher.finish() as usize % self.capacity;
 
-    //     while let Some(ref existing) = self.data[position] {
-    //         if *existing == *item {
-    //             self.data[position] = None;
-    //             self.save();
-    //             return;
-    //         }
+        while let Some(ref existing) = self.data[position] {
+            if *existing == *item {
+                self.data[position] = None;
+                self.save();
+                return;
+            }
 
-    //         position = (position + 1) % self.capacity;
-    //     }
-    // }
+            position = (position + 1) % self.capacity;
+        }
+    }
 
     pub fn fill(&mut self, items: Vec<T>) {
         for item in items {

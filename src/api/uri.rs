@@ -166,6 +166,7 @@ pub async fn create_uri(
         let pinata_api = match PinataApi::new(pinata_api_key, pinata_secret_api_key) {
             Ok(api) => api,
             Err(_) => {
+                hashtable.delete(&combination.clone());
                 return Err(TaskError::MetadataFailed);
             }
         };
@@ -181,6 +182,7 @@ pub async fn create_uri(
             let signature = match sign_message(&private_key, &ipfs_uri).await {
                 Ok(sig) => sig,
                 Err(_) => {
+                    hashtable.delete(&combination.clone());
                     return Err(TaskError::SignatureFailed);
                 }
             };
@@ -195,6 +197,7 @@ pub async fn create_uri(
             Ok::<Json<SignedURIResponse>, TaskError>(Json(response_data))
 
         } else {
+            hashtable.delete(&combination.clone());
             return Err(TaskError::MetadataFailed);
         }
     } else {

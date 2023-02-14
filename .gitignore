@@ -14,3 +14,4 @@ config/*config.env
 **/*.tfstate.backup
 **/*.terraform.lock.hcl
 Makefile
+package.json

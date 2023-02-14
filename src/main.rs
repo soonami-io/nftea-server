@@ -7,7 +7,8 @@ use repository::attributes::populate_attributes;
 use model::metadata::Attribute;
 use crate::repository::hashtable::HashTable;
 
-use actix_web::{HttpServer, App, middleware::Logger};
+use actix_web::{http, HttpServer, App, middleware::{DefaultHeaders, Logger}};
+use actix_cors::Cors;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -31,14 +32,25 @@ async fn main() -> std::io::Result<()> {
         let dynamic_attribute_array = populate_attributes(&mut dynamic_attribute_array_placeholder);
         dynamic_attributes.fill(dynamic_attribute_array);
     }
-    
+
     HttpServer::new( move || {
         let logger = Logger::default();
         App::new()
         .wrap(logger)
+        .wrap(DefaultHeaders::new().add(("Access-Control-Allow-Origin", "*")))
+        .wrap(Cors::default()
+        .allow_any_origin()
+        .allowed_methods(vec!["POST"])
+        .allowed_headers(vec![
+            http::header::AUTHORIZATION,
+            http::header::ACCEPT,
+            http::header::CONTENT_TYPE,
+        ])
+        .allowed_header(http::header::CONTENT_TYPE)
+        .max_age(3600))
         .service(create_uri)
     })
-    .bind(("127.0.0.1", 80))?
+    .bind(("127.0.0.1", 8080))?
     .run()
     .await
 }

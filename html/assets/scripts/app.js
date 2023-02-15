@@ -1,6 +1,5 @@
 const { createApp, ref } = Vue;
 
-// const { contractAbi } = PaymentWrapper.json
 const primary_ingredients = [
   {
     id: 0,
@@ -140,17 +139,22 @@ const app_component = {
       random_primary_index: 0,
       wallet_address: null,
       web3_connected: false,
-      payment_contract_address: "0x12CB33d84E119EE06Ad2BcDea0bb269E04cf373e",
-      mquark_contract_address: "0x50Fbd77919F74777967fEFB45a7Edad0aD5025C1",
+      //!change addresses
+      // payment_contract_address: "0x874908964FA2fF017947B880E2C9fef95bb98F66",
+      payment_contract_address: "0xDEE416e75A8443dE13DbbBf0C3b558F7fC45eC2c",
+      // mquark_contract_address: "0x50Fbd77919F74777967fEFB45a7Edad0aD5025C1",
+      mquark_contract_address: "0x30aB861483079Cbb58B0DC95804B861DD5Aa631F",
       payment_abi: abi,
       _mquark_abi: mquark_abi,
       contribution: 0,
       show_popup: false,
       brewed_tea: null,
-      backend_response: { signer: "", signature: "", uri: "", salt: "", projectId: "1", templateId: "1", collectionId: "4" },
+      //!change below
+      backend_response: { signer: "0x49dbfb94314CF76b2Fe990e9dc5E59AF7b68E4b1", signature: "", uri: "", salt: "0x01", projectId: "1", templateId: "1", collectionId: "1",isLoading:false },
       transactionLoading: false,
       transactionSuccess: false,
       mintedNftCount: 0,
+      totalContributedAmount: 0
     };
   },
   computed: {
@@ -173,10 +177,10 @@ const app_component = {
         const networkId = await window.ethereum.request({
           method: "net_version",
         });
-        // if (networkId == 137) { // Polygon mainnet networkid
-        if (networkId == 80001) {
+        if (networkId == 137) { // Polygon mainnet networkid
+        // if (networkId == 80001) {
           // mumbai networkid
-          console.log(networkId);
+          console.log("networkid", networkId);
           try {
             const ok = await ethereum.request({ method: "eth_requestAccounts" });
             this.wallet_address = ok[0];
@@ -192,8 +196,8 @@ const app_component = {
             // check if the chain to connect to is installed
             await window.ethereum.request({
               method: "wallet_switchEthereumChain",
-              // params: [{ chainId: '0x89' }], // chainId must be in hexadecimal numbers
-              params: [{ chainId: "0x13881" }], // chainId must be in hexadecimal numbers
+              params: [{ chainId: '0x89' }], // chainId must be in hexadecimal numbers
+              // params: [{ chainId: "0x13881" }], // chainId must be in hexadecimal numbers
             });
             const ok = await ethereum.request({ method: "eth_requestAccounts" });
             this.wallet_address = ok[0];
@@ -222,8 +226,8 @@ const app_component = {
                 });
                 await window.ethereum.request({
                   method: "wallet_switchEthereumChain",
-                  // params: [{ chainId: '0x89' }], // chainId must be in hexadecimal numbers
-                  params: [{ chainId: "0x13881" }], // chainId must be in hexadecimal numbers
+                  params: [{ chainId: '0x89' }], // chainId must be in hexadecimal numbers
+                  // params: [{ chainId: "0x13881" }], // chainId must be in hexadecimal numbers
                 });
                 try {
                   const ok = await ethereum.request({ method: "eth_requestAccounts" });
@@ -258,15 +262,36 @@ const app_component = {
     //call backend here
     brew_tea: async function () {
       let initialValue = "";
-      let result = this.nft_combination.reduce((accumulator, currentValue) => accumulator.concat(currentValue.name), initialValue);
-      console.log(result.replace(/\s/g, ""));
-      //call backend get the response
-      this.backend_response.signer = "0xC52d3ECB7F84A27c68541933FDd5b74b96334c05";
-      this.backend_response.signature = "0xce85d4f55dd42b09883704961a9c1374303bb09b093b84f0ecc0f0b355c0848237054c93254d933dc1cd9b1adbca0b2d45a548ccf2b131af3379469d75be27241c";
-      this.backend_response.uri = "https://mquark.infura-ipfs.io/ipfs/QmaPvrGQWjNQNSmPt5bbK7bGMorHooxhAXZZqRMnmSmssN";
-      this.backend_response.salt = "0x18";
+      if(this.nft_combination == "") {
+        window.alert("Please select at least a one ingredient!")
+        return;
+      }
+      let _combination = this.nft_combination.reduce((accumulator, currentValue) => accumulator.concat(currentValue.name+"_"), initialValue);
+      _combination = _combination.substring(0, _combination.length - 1);
 
-      this.brewed_tea = "./assets/image/dalle.png";
+      const data = {
+        combination: _combination
+      };
+      this.backend_response.isLoading= true;
+      try {
+        const response = await axios.post('https://cupofteanft.xyz/uri', data);
+        let _respone = response.data;
+
+        window.localStorage.setItem("brewed_tea",JSON.stringify(_respone))
+
+        this.backend_response.signature = `0x${_respone.signature}`
+        let cid = _respone.metadata.image.split("/");
+        cid = cid[4].concat("/"+cid[5]);
+        this.brewed_tea = `https://teal-worthwhile-mandrill-830.mypinata.cloud/ipfs/${cid}`
+        this.backend_response.salt = "0x01";
+        this.backend_response.uri = _respone.ipfs_uri;
+        this.backend_response.isLoading= false;
+      } catch(error) {
+        console.error("error",error);
+        if (error.response.data === "NftTaken") alert("NFT is taken. Please reorder your ingridients, or change them or add some more ingridents.")
+        this.backend_response.isLoading= false;
+      }
+      this.backend_response.isLoading= false;
     },
     //show contribution popup
     set_show_popup: async function () {
@@ -275,14 +300,24 @@ const app_component = {
     // send the transaction
     mint_with_contributing: async function () {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
+      const signer = await provider.getSigner();
+      const signer_address = await signer.getAddress();
       const payment_contract = new ethers.Contract(this.payment_contract_address, this.payment_abi, signer);
+
       try {
-        if (this.contribution <= 0) {
-          window.alert("The contribution should be higher than 0, or you can mint for free on the left button.");
+        const mintStatus = await payment_contract.mintedAddresses(signer_address);
+        if(mintStatus) window.alert("You have already minted NFTea!");
+      } catch(error) {
+        console.error("minting contract call reverted!");
+        console.error(error);
+      }
+
+      try {
+        if (this.contribution < 0) {
+          window.alert("The contribution can't be a minus value, or you can mint for free on the left button.");
           return;
         }
-        let tx = await payment_contract.voluntarilyPayment(
+        let tx = await payment_contract.voluntaryContributionMint(
           this.backend_response.signer,
           this.backend_response.projectId,
           this.backend_response.templateId,
@@ -292,41 +327,50 @@ const app_component = {
           this.backend_response.salt,
           { value: ethers.utils.parseEther(this.contribution) }
         );
+        this.contribution = 0;
         this.set_transaction_loading();
         await tx.wait();
         this.set_transaction_success();
       } catch (error) {
         if (error.message == "MetaMask Tx Signature: User denied transaction signature.")  console.log(error.message);
-        else window.alert("An error happened sending the transaction. Please check your balance is enough for the contribution.");
+        else window.alert("An error happened. You may have forgotten to input a MATIC value. Or please check if your balance has sufficient fund for the contribution. Else you may have already minted one NFTea!");
       }
     },
     mint_free: async function () {
-      console.log("send without contribution");
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      const mquark_contract = new ethers.Contract(this.mquark_contract_address, this._mquark_abi, signer);
+      const signer = await provider.getSigner();
+      const signer_address = await signer.getAddress();
+      const payment_contract = new ethers.Contract(this.payment_contract_address, this.payment_abi, signer);
       try {
-        let tx = await mquark_contract.mintFreeWithPreURI(
+        const mintStatus = await payment_contract.mintedAddresses(signer_address);
+        if(mintStatus) window.alert("You have already minted NFTea!");
+      } catch(error) {
+        console.error("minting contract call reverted!");
+        console.error(error);
+      }
+
+      try {
+        let tx = await payment_contract.voluntaryContributionMint(
           this.backend_response.signer,
           this.backend_response.projectId,
           this.backend_response.templateId,
           this.backend_response.collectionId,
           this.backend_response.signature,
           this.backend_response.uri,
-          this.backend_response.salt
+          this.backend_response.salt,
+          { value: 0 }
         );
+        this.contribution = 0;
         this.set_transaction_loading();
-        await tx.wait()
-        this.set_transaction_success()
+        await tx.wait();
+        this.set_transaction_success();
       } catch (error) {
         if (error.message == "MetaMask Tx Signature: User denied transaction signature.")  console.log(error.message);
-        else window.alert("An error happened sending the transaction. Please check your balance is enough for the contribution.");
-       
+        else window.alert("An error happened. Please check your balance is enough for the contribution or you may have already minted one!");
       }
     },
     setContribution: function (amount) {
       this.contribution = amount;
-      console.log(amount);
     },
   },
   watch: {
@@ -344,10 +388,27 @@ const app_component = {
     },
   },
   mounted: async function () {
-    const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.g.alchemy.com/v2/6C2ub0-l9nAs7qb_17wH8OVfs0ECYfGC");
+    if(window.localStorage.getItem("brewed_tea")) this.backend_response.isLoading = true;
+    const provider = new ethers.providers.JsonRpcProvider("https://polygon-mainnet.g.alchemy.com/v2/N9HCtvuidF3dTQuRuQ3ORN304LADukdp");
     const mquark_contract = new ethers.Contract(this.mquark_contract_address, this._mquark_abi, provider);
-    let result = await mquark_contract.getProjectCollection("1", "1", "4");
+    const payment_contract = new ethers.Contract(this.payment_contract_address, this.payment_abi, provider);
+
+    let result = await mquark_contract.getProjectCollection("1", "1", "1");
     this.mintedNftCount = result.mintCount.toString();
+
+    let _totalContributedAmount = await payment_contract.getTotalContribution();
+    this.totalContributedAmount = ethers.utils.formatEther(_totalContributedAmount);
+    if(window.localStorage.getItem("brewed_tea")){
+
+      let _response = JSON.parse(window.localStorage.getItem("brewed_tea"));
+      this.backend_response.signature = `0x${_response.signature}`
+      let cid = _response.metadata.image.split("/");
+      cid = cid[4].concat("/"+cid[5]);
+      this.brewed_tea = `https://teal-worthwhile-mandrill-830.mypinata.cloud/ipfs/${cid}`
+      this.backend_response.salt = "0x01";
+      this.backend_response.uri = _response.ipfs_uri;
+    } 
+    this.backend_response.isLoading = false;
   },
 };
 

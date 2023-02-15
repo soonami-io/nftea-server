@@ -10,7 +10,8 @@ use crate::model::metadata::{
 };
 use crate::repository::hashtable::HashTable;
 use dotenv::dotenv;
-use std::env;
+use std::{env};
+use std::str::FromStr;
 use pinata_sdk::{PinataApi, PinByJson};
 use hex;
 use ethers_signers::{Signer, LocalWallet};
@@ -19,11 +20,16 @@ use ethers_core::abi::encode;
 use ethers_core::types::{Address, U256};
 use serde::{Deserialize};
 use derive_more::{Display};
+use mime;
+
+use actix_files as fs;
 use actix_web::{
+    get,
     post, 
     error::ResponseError,
     web::Json,
     HttpResponse,
+    HttpRequest,
     http::{header::ContentType, StatusCode}
 };
 
@@ -57,6 +63,61 @@ impl ResponseError for TaskError {
     }
 }
 
+
+
+#[get("/mint")]
+async fn mint(_req: HttpRequest) -> actix_web::Result<fs::NamedFile> {
+    let file = fs::NamedFile::open(format!("html/mint.html"))?;
+    let mime_type = mime::Mime::from_str("text/html").expect("Failed to set MimeType");
+    Ok(file.set_content_type(mime_type))
+}
+
+#[get("/")]
+async fn index(_req: HttpRequest) -> actix_web::Result<fs::NamedFile> {
+    let file = fs::NamedFile::open(format!("html/index.html"))?;
+    let mime_type = mime::Mime::from_str("text/html").expect("Failed to set MimeType");
+    Ok(file.set_content_type(mime_type))
+}
+
+#[get("/{filename:.*}")]
+async fn files(req: HttpRequest) -> actix_web::Result<fs::NamedFile> {
+    // Serve static files from the "html" directory
+    let path: std::path::PathBuf = req.match_info().query("filename").parse().map_err(|_| {
+        actix_web::error::ErrorBadRequest("Invalid filename parameter")
+    })?;
+    let file_path = format!("html/{}", path.display());
+    let file = match fs::NamedFile::open(&file_path) {
+        Ok(file) => file,
+        Err(error) => {
+            if error.kind() == std::io::ErrorKind::NotFound {
+                return Err(actix_web::error::ErrorNotFound("File not found"));
+            } else {
+                return Err(actix_web::error::ErrorInternalServerError("Failed to read file"));
+            }
+        }
+    };
+
+    // Set content type based on file extension
+    let extension = file
+        .path()
+        .extension()
+        .and_then(std::ffi::OsStr::to_str)
+        .ok_or_else(|| actix_web::error::ErrorInternalServerError("Failed to get file extension"))?;
+    let content_type = match extension {
+        "html" => "text/html",
+        "css" => "text/css",
+        "js" => "text/javascript",
+        "ttf" => "font/ttf",
+        "jpeg" | "jpg" => "image/jpeg",
+        "png" => "image/png",
+        "gif" => "image/gif",
+        "svg" => "image/svg+xml",
+        "mp4" => "video/mp4",
+        _ => "application/octet-stream",
+    };
+    let mime_type = mime::Mime::from_str(content_type).expect("Failed to set MimeType");
+    Ok(file.set_content_type(mime_type))
+}
 
 
 #[post("/uri")]

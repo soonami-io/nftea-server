@@ -2,7 +2,7 @@ mod api;
 mod model;
 mod repository;
 
-use api::uri::create_uri;
+use api::uri::{create_uri, mint, index, files};
 use repository::attributes::populate_attributes;
 use model::metadata::Attribute;
 use crate::repository::hashtable::HashTable;
@@ -51,6 +51,9 @@ async fn main() -> std::io::Result<()> {
         .supports_credentials())
         .route("/health_check", web::get().to(|| HttpResponse::Ok()))
         .service(create_uri)
+        .service(index)
+        .service(mint)
+        .service(files)
     })
     .bind(("127.0.0.1", 8080))?
     .run()

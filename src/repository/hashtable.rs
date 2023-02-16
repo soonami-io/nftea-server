@@ -18,8 +18,8 @@ impl<T: Hash + std::clone::Clone + std::cmp::PartialEq + Serialize + for<'a> Des
         if let Ok(file) = File::open(file_name) {
             let mut reader = BufReader::new(file);
             let mut buffer = Vec::new();
-            reader.read_to_end(&mut buffer).unwrap();
-            data = deserialize(&buffer).unwrap();
+            reader.read_to_end(&mut buffer).expect("reading hashtable failed!");
+            data = deserialize(&buffer).expect("deserializing hashtable data failed!");
         }
         Self {
             data,
@@ -112,9 +112,9 @@ impl<T: Hash + std::clone::Clone + std::cmp::PartialEq + Serialize + for<'a> Des
     }
 
     fn save(&self) {
-        let serialized = serialize(&self.data).unwrap();
-        let file = File::create(&self.file_name).unwrap();
+        let serialized = serialize(&self.data).expect("Serialization for saving Hashtable failed!");
+        let file = File::create(&self.file_name).expect("Hahtable replacement file failed!");
         let mut writer = BufWriter::new(file);
-        writer.write(&serialized).unwrap();
+        writer.write(&serialized).expect("Saving hashtable failed!");
     }
 }

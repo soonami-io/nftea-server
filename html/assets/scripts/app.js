@@ -288,7 +288,7 @@ const app_component = {
         this.backend_response.isLoading= false;
       } catch(error) {
         console.error("error",error);
-        if (error.response.data === "NftTaken") alert("NFT is taken. Please reorder your ingridients, or change them or add some more ingridents.")
+        if (error.response.data === "NftTaken") alert("This combination has already been used by someone else. Each NFTea is unique! Please experiment with ingredient including their order and quantity.")
         this.backend_response.isLoading= false;
       }
       this.backend_response.isLoading= false;
